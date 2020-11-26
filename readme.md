@@ -1,6 +1,6 @@
 # nand
 
-Playground to play with logic gates
+Logic gate playground
 
 ## Development
 
