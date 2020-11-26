@@ -1,0 +1,52 @@
+*,
+html {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  background: lemonchiffon;
+}
+
+#app {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+	justify-content: space-between;
+}
+
+.canvasIOContainer {
+  display: flex;
+  height: 100vh;
+  width: 100px;
+	background: skyblue;
+	flex-direction: column;
+	justify-content: space-around;
+}
+
+.box {
+  height: 100px;
+  width: 100px;
+	background: orange;
+	display: flex;
+	justify-content: space-between;
+}
+
+.ioContainer {
+	height: 100%;
+	width: 25%;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+}
+
+.connector {
+	width: 100%;
+	background: white;
+	flex: 1;
+}
+
+.connectorSpacer {
+	flex: 0.5;
+	background: none;
+}
