@@ -1,5 +1,8 @@
 {
   "devDependencies": {
     "typescript": "^4.1.2"
+  },
+  "dependencies": {
+    "leader-line": "^1.0.5"
   }
 }

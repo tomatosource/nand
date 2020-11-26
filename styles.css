@@ -15,6 +15,15 @@ html {
 	justify-content: space-between;
 }
 
+#canvas {
+	flex: 1;
+	height: 100%;
+	display: flex;
+	justify-content: space-around;
+	align-items: center;
+
+}
+
 .canvasIOContainer {
   display: flex;
   height: 100vh;
@@ -32,6 +41,10 @@ html {
 	justify-content: space-between;
 }
 
+.box switch {
+	background: lightgrey;
+}
+
 .ioContainer {
 	height: 100%;
 	width: 25%;
@@ -42,8 +55,12 @@ html {
 
 .connector {
 	width: 100%;
-	background: white;
+	background: grey;
 	flex: 1;
+}
+
+.connector.on {
+	background: red;
 }
 
 .connectorSpacer {
