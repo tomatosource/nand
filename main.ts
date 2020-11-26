@@ -1,7 +1,7 @@
-import LeaderLine  from 'leader-line';
+import LeaderLine from 'leader-line';
 
 interface IBox {
-	ele: HTMLElement;
+  ele: HTMLElement;
   setInput(i: number, v: boolean): void;
   getOutputState(i: number): boolean;
 }
@@ -11,6 +11,7 @@ class Connection {
   sourceIndex: number;
   destinationBox: IBox;
   destinationIndex: number;
+  line: LeaderLine;
 
   constructor(
     sourceBox: IBox,
@@ -24,18 +25,30 @@ class Connection {
     this.destinationBox = destinationBox;
     this.destinationIndex = destinationIndex;
 
+    destinationBox.setInput(destinationIndex, initValue);
+
     const sourceIOContainers = sourceBox.ele.querySelectorAll('.ioContainer');
     const sourceConns = sourceIOContainers[1].querySelectorAll('.connector');
-    const destIOContainers = destinationBox.ele.querySelectorAll('.ioContainer');
+    const destIOContainers = destinationBox.ele.querySelectorAll(
+      '.ioContainer',
+    );
     const destConns = destIOContainers[0].querySelectorAll('.connector');
-    new LeaderLine(sourceConns[sourceIndex], destConns[destinationIndex]);
+    this.line = new LeaderLine(
+      sourceConns[sourceIndex],
+      destConns[destinationIndex],
+      {
+        startSocket: 'right',
+        endSocket: 'left',
+        color: initValue ? 'red' : 'grey',
+      },
+    );
   }
 }
 
 class Box implements IBox {
   inputs: boolean[];
   inputEles: HTMLElement[];
-	ele: HTMLElement;
+  ele: HTMLElement;
 
   inputConnections: Connection[][];
   outputs: Connection[][];
@@ -100,6 +113,12 @@ class Nand implements IBox {
         this.state = newState;
         setOutputDom(this.ele, 0, this.state);
 
+        this.outputs[0].forEach(c => {
+          c.line.setOptions({
+            color: this.state ? 'red' : 'grey',
+          });
+        });
+
         this.outputs[0].forEach(o => {
           o.destinationBox.setInput(o.destinationIndex, this.state);
         });
@@ -136,6 +155,12 @@ class SourceSwitch implements IBox {
         o.destinationBox.setInput(o.destinationIndex, v);
       });
       setOutputDom(this.ele, 0, v);
+
+      this.outputs.forEach(c => {
+        c.line.setOptions({
+          color: this.state ? 'red' : 'grey',
+        });
+      });
     }
   }
 
