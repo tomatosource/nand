@@ -28,7 +28,6 @@ html {
   display: flex;
   height: 100vh;
   width: 100px;
-	background: skyblue;
 	flex-direction: column;
 	justify-content: space-around;
 }
@@ -61,6 +60,14 @@ html {
 
 .connector.on {
 	background: red;
+}
+
+.connector.on.active {
+	background: green;
+}
+
+.connector.active {
+	background: green;
 }
 
 .connectorSpacer {
