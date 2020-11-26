@@ -1,4 +1,5 @@
 import LeaderLine from 'leader-line';
+import PlainDraggable from 'plain-draggable';
 
 class App {
   canvas: Canvas;
@@ -104,6 +105,7 @@ class Nand implements IBox {
   outputs: Connection[][];
   ele: HTMLElement;
   state: boolean;
+	draggable: PlainDraggable;
 
   constructor() {
     this.inputs = [false, false];
@@ -115,6 +117,7 @@ class Nand implements IBox {
     this.ele = buildBoxHTML(this, 2, 1, 'NAND');
     canvasDiv.appendChild(this.ele);
     setOutputDom(this.ele, 0, this.state);
+		this.draggable = new PlainDraggable(this.ele);
   }
 
   getOutputState(_: number): boolean {
@@ -148,6 +151,10 @@ class Nand implements IBox {
   }
 
   addInputConnection(sourceBox: IBox, sourceIndex: number, inputIndex: number) {
+		if (this.inputConnections[inputIndex] != undefined) {
+			return;
+		}
+
     const conn = new Connection(
       sourceBox,
       sourceIndex,

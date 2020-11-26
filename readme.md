@@ -11,19 +11,17 @@ parcel index.html
 ## TODO
 
 UI
- - add new supported box to canvas
- - edit connections
-   + add connection
-   + remove connection
- - remove existing box
  - move existing box
+ - add new nand
+ - remove existing box
+ - fixed source
  - add fixed ON/OFF inputs to canvas
  - change number of canvas inputs/outputs
-   + new input
-   + remove input
-   + new output
-   + remove output
- - save canvas as Box
+ - save canvas as box
+ - add saved box to canvas
+
+ ================================
+
  - load box as canvas
  - save/load Boxes between sessions
  - save selection area as box
