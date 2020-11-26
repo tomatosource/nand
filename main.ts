@@ -105,7 +105,7 @@ class Nand implements IBox {
   outputs: Connection[][];
   ele: HTMLElement;
   state: boolean;
-	draggable: PlainDraggable;
+  draggable: PlainDraggable;
 
   constructor() {
     this.inputs = [false, false];
@@ -117,7 +117,23 @@ class Nand implements IBox {
     this.ele = buildBoxHTML(this, 2, 1, 'NAND');
     canvasDiv.appendChild(this.ele);
     setOutputDom(this.ele, 0, this.state);
-		this.draggable = new PlainDraggable(this.ele);
+    this.draggable = new PlainDraggable(this.ele);
+		this.draggable.snap = {step: 15};
+		// on drag sync up lines
+    this.draggable.onMove = () => {
+      this.inputConnections.forEach(c => {
+        if (c && c.line) {
+          c.line.position();
+        }
+      });
+      this.outputs.forEach(o => {
+        o.forEach(c => {
+          if (c && c.line) {
+            c.line.position();
+          }
+        });
+      });
+    };
   }
 
   getOutputState(_: number): boolean {
@@ -151,9 +167,9 @@ class Nand implements IBox {
   }
 
   addInputConnection(sourceBox: IBox, sourceIndex: number, inputIndex: number) {
-		if (this.inputConnections[inputIndex] != undefined) {
-			return;
-		}
+    if (this.inputConnections[inputIndex] != undefined) {
+      return;
+    }
 
     const conn = new Connection(
       sourceBox,
@@ -222,7 +238,7 @@ class SourceSwitch implements IBox {
   }
 
   getInputState(_: number): boolean {
-		return false;
+    return false;
   }
 
   setInput(_: number, v: boolean): void {
@@ -303,7 +319,7 @@ class Indicator implements IBox {
   }
 
   getInputState(_: number): boolean {
-		return this.state;
+    return this.state;
   }
 
   setInput(i: number, v: boolean): void {
@@ -435,7 +451,11 @@ function main() {
   app.canvas = c;
 
   // create and add nand to canvas
-  const n = new Nand();
+  let n = new Nand();
+  c.children.push(n);
+  n = new Nand();
+  c.children.push(n);
+  n = new Nand();
   c.children.push(n);
 
   setupKeys();
