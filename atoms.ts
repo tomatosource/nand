@@ -1,5 +1,5 @@
 import { Connection, App } from './main';
-import { IBox } from './interface';
+import { InputConnection, IBox } from './interface';
 import {
   clearSelectionFromBox,
   setOutputDom,
@@ -19,8 +19,8 @@ export class Nand implements IBox {
   ele?: HTMLElement;
   private draggable: PlainDraggable;
 
-  constructor(app: App, rendered: boolean) {
-    this.id = (Math.random() + 1).toString(36).substring(7);
+  constructor(app: App, rendered: boolean, id?: string) {
+    this.id = id || (Math.random() + 1).toString(36).substring(7);
     this.rendered = rendered;
     this.inputs = [false, false];
     this.inputConnections = [undefined, undefined];
@@ -176,8 +176,8 @@ export class SourceSwitch implements IBox {
   ele?: HTMLElement;
   private draggable: PlainDraggable;
 
-  constructor(app: App, rendered: boolean) {
-    this.id = (Math.random() + 1).toString(36).substring(7);
+  constructor(app: App, rendered: boolean, id?: string) {
+    this.id = id || (Math.random() + 1).toString(36).substring(7);
     this.state = false;
     this.outputs = [];
     this.rendered = rendered;
@@ -297,11 +297,13 @@ export class Indicator implements IBox {
   rendered: boolean;
   ele?: HTMLElement;
   private draggable: PlainDraggable;
+	forwardingList: InputConnection[];
 
-  constructor(app: App, rendered: boolean) {
-    this.id = (Math.random() + 1).toString(36).substring(7);
+  constructor(app: App, rendered: boolean, id?: string) {
+    this.id = id || (Math.random() + 1).toString(36).substring(7);
     this.state = false;
     this.rendered = rendered;
+		this.forwardingList = [];
 
     if (rendered) {
       const canvasDiv = document.getElementById('canvas');
@@ -328,6 +330,9 @@ export class Indicator implements IBox {
     if (v != this.state) {
       this.state = v;
       setInputDom(this.ele, i, v);
+			this.forwardingList.forEach(ic => {
+				ic.box.setInput(ic.index, v);
+			});
     }
   }
 
