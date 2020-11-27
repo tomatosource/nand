@@ -10,13 +10,11 @@ parcel index.html
 
 ## TODO
 
- - add new nand
- - remove existing nand
- - change number of canvas inputs/outputs
- - fixed sources
  - save canvas as box
  - add saved box to canvas
  - save/load Boxes between sessions
- - load box as canvas
- - clock?
-
+ - only pins?
+ - fixed sources
+ - clock
+ - edit box as canvas
+ - new canvas
