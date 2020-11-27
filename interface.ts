@@ -31,14 +31,16 @@ export interface IBox {
   getOutputCount(): number;
   clean(): void;
   clearSelection(isInput: boolean, selectedIndex: number): void;
+	getNode(): N;
+	getEdges(): E[];
 }
 
-interface G {
+export interface G {
   nodes: N[];
   edges: E[];
 }
 
-interface E {
+export interface E {
   n1: string;
   n1Index: number;
   n2: string;
@@ -55,7 +57,7 @@ export enum AtomType {
   // OFF,
 }
 
-interface N {
+export interface N {
   id: string;
   innerG?: G;
   kind: AtomType;
@@ -306,4 +308,22 @@ export class BlackBox implements IBox {
       this.ele.remove();
     }
   }
+
+	getNode(): N {
+		return  {
+			id: this.id,
+			innerG: this.graph,
+			kind: AtomType.BB,
+			label: this.label,
+		}
+	}
+
+	getEdges(): E[] {
+		return this.inputConnections.map((c, i) => ({
+			n1: this.id,
+			n1Index: i,
+			n2: c.sourceBox.id,
+			n2Index: c.sourceIndex,
+		}));
+	}
 }

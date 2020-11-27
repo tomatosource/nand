@@ -1,5 +1,5 @@
 import { Connection, App } from './main';
-import { InputConnection, IBox } from './interface';
+import { N, E, AtomType, InputConnection, IBox } from './interface';
 import {
   clearSelectionFromBox,
   setOutputDom,
@@ -170,6 +170,23 @@ export class Nand implements IBox {
       this.ele.remove();
     }
   }
+
+  getNode(): N {
+    return {
+      id: this.id,
+      kind: AtomType.NAND,
+      label: 'NAND',
+    };
+  }
+
+  getEdges(): E[] {
+    return this.inputConnections.map((c, i) => ({
+      n1: this.id,
+      n1Index: i,
+      n2: c.sourceBox.id,
+      n2Index: c.sourceIndex,
+    }));
+  }
 }
 
 export class SourceSwitch implements IBox {
@@ -294,6 +311,18 @@ export class SourceSwitch implements IBox {
       this.ele.remove();
     }
   }
+
+  getNode(): N {
+    return {
+      id: this.id,
+      kind: AtomType.I,
+      label: 'I',
+    };
+  }
+
+  getEdges(): E[] {
+    return [];
+  }
 }
 
 export class Indicator implements IBox {
@@ -375,10 +404,12 @@ export class Indicator implements IBox {
 
   removeInputConnection(i: number) {
     const conn = this.input;
-    conn.sourceBox.removeOutputConnection(conn.sourceIndex, conn.id);
-    conn.line.remove();
-    this.input = undefined;
-    this.setInput(i, false);
+    if (conn !== undefined) {
+      conn.sourceBox.removeOutputConnection(conn.sourceIndex, conn.id);
+      conn.line.remove();
+      this.input = undefined;
+      this.setInput(i, false);
+    }
   }
 
   removeAllConnections() {
@@ -413,5 +444,27 @@ export class Indicator implements IBox {
 
   getState(): boolean {
     return this.state;
+  }
+
+  getNode(): N {
+    return {
+      id: this.id,
+      kind: AtomType.O,
+      label: 'O',
+    };
+  }
+
+  getEdges(): E[] {
+    if (this.input === undefined) {
+      return [];
+    }
+    return [
+      {
+        n1: this.id,
+        n1Index: 0,
+        n2: this.input.sourceBox.id,
+        n2Index: this.input.sourceIndex,
+      },
+    ];
   }
 }

@@ -1,8 +1,9 @@
-import { IBox, BlackBox, AtomType } from './interface';
+import { G, IBox, BlackBox, AtomType } from './interface';
 import { setOutputDom, setInputDom, buildBoxHTML } from './utils';
 import { Nand, SourceSwitch, Indicator } from './atoms';
 import LeaderLine from 'leader-line';
 import PlainDraggable from 'plain-draggable';
+import { v4 as uuid } from 'uuid';
 
 export class App {
   canvas: Canvas;
@@ -92,13 +93,24 @@ export class Connection {
   }
 }
 
+type Generator = {
+	f: (app: App, id: string) => IBox;
+	label: string;
+}
+
 class Canvas {
   app: App;
   children: IBox[];
+	gens: Generator[];
 
   constructor(app: App) {
     this.app = app;
     this.children = [];
+		this.gens = [
+			{f: (app: App, id: string) => new Nand(app, true, id), label: "nand"},
+			{f: (app: App, id: string) => new SourceSwitch(app, true, id), label: "input"},
+			{f: (app: App, id: string) => new Indicator(app, true, id), label: "output"},
+		];
   }
 
   remove(box: IBox) {
@@ -107,13 +119,42 @@ class Canvas {
 
     this.children = this.children.filter(c => c.id !== id);
   }
+
+  makeG(): G {
+    const nodes = this.children.map(c => c.getNode());
+    let edges = [];
+    this.children.forEach(c => edges.push(...c.getEdges()));
+    return {
+      nodes,
+      edges,
+    };
+  }
+
+  clear() {
+    while (this.children.length > 0) {
+      this.remove(this.children[0]);
+    }
+  }
+
+	saveNewBB() {
+		const g = this.makeG();
+		const label = prompt("label", "");
+
+		let newBB = (app: App, id: string): IBox => new BlackBox(
+			app, true, g, label, id,
+		);
+		this.gens.push({f: newBB, label});
+		this.clear();
+	}
+
+	newChild(i: number) {
+		this.children.push(this.gens[i].f(app, uuid()));
+	}
 }
 
 function main() {
-  // new 2in/1out canvas
   const c = new Canvas(app);
   app.canvas = c;
-
   setupKeys();
 }
 
@@ -144,34 +185,12 @@ function setupKeys() {
         app.canvas.children.push(new Indicator(app, true));
         break;
       }
-      case '1': {
-        app.canvas.children.push(
-          new BlackBox(
-            app,
-            true,
-            {
-              nodes: [
-                { id: 'a', kind: AtomType.I, label: 'in-top' },
-                { id: 'b', kind: AtomType.I, label: 'in-bottom' },
-                { id: 'c', kind: AtomType.NAND, label: 'top-left-nand' },
-                { id: 'd', kind: AtomType.NAND, label: 'bottom-left-nand' },
-                { id: 'e', kind: AtomType.NAND, label: 'right nand' },
-                { id: 'f', kind: AtomType.O, label: 'output' },
-              ],
-              edges: [
-                { n1: 'c', n1Index: 0, n2: 'a', n2Index: 0 },
-                { n1: 'c', n1Index: 1, n2: 'a', n2Index: 0 },
-                { n1: 'd', n1Index: 0, n2: 'b', n2Index: 0 },
-                { n1: 'd', n1Index: 1, n2: 'b', n2Index: 0 },
-                { n1: 'e', n1Index: 0, n2: 'c', n2Index: 0 },
-                { n1: 'e', n1Index: 1, n2: 'd', n2Index: 0 },
-                { n1: 'f', n1Index: 0, n2: 'e', n2Index: 0 },
-              ],
-            },
-            'OR',
-            'askldjaklsdj',
-          ),
-        );
+      case 's': {
+        app.canvas.saveNewBB();
+        break;
+      }
+      case '3': {
+				app.canvas.newChild(3);
         break;
       }
       case 'x': {
