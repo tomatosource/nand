@@ -1,4 +1,4 @@
-import { IBox } from './interface';
+import { IBox, BlackBox, AtomType } from './interface';
 import { setOutputDom, setInputDom, buildBoxHTML } from './utils';
 import { Nand, SourceSwitch, Indicator } from './atoms';
 import LeaderLine from 'leader-line';
@@ -102,7 +102,7 @@ class Canvas {
   }
 
   remove(box: IBox) {
-		box.clean();
+    box.clean();
     const id = box.id;
 
     this.children = this.children.filter(c => c.id !== id);
@@ -142,6 +142,36 @@ function setupKeys() {
       }
       case 'o': {
         app.canvas.children.push(new Indicator(app, true));
+        break;
+      }
+      case '1': {
+        app.canvas.children.push(
+          new BlackBox(
+            app,
+            true,
+            {
+              nodes: [
+                { id: 'a', kind: AtomType.I, label: 'in-top' },
+                { id: 'b', kind: AtomType.I, label: 'in-bottom' },
+                { id: 'c', kind: AtomType.NAND, label: 'top-left-nand' },
+                { id: 'd', kind: AtomType.NAND, label: 'bottom-left-nand' },
+                { id: 'e', kind: AtomType.NAND, label: 'right nand' },
+                { id: 'f', kind: AtomType.O, label: 'output' },
+              ],
+              edges: [
+                { n1: 'c', n1Index: 0, n2: 'a', n2Index: 0 },
+                { n1: 'c', n1Index: 1, n2: 'a', n2Index: 0 },
+                { n1: 'd', n1Index: 0, n2: 'b', n2Index: 0 },
+                { n1: 'd', n1Index: 1, n2: 'b', n2Index: 0 },
+                { n1: 'e', n1Index: 0, n2: 'c', n2Index: 0 },
+                { n1: 'e', n1Index: 1, n2: 'd', n2Index: 0 },
+                { n1: 'f', n1Index: 0, n2: 'e', n2Index: 0 },
+              ],
+            },
+            'OR',
+            'askldjaklsdj',
+          ),
+        );
         break;
       }
       case 'x': {

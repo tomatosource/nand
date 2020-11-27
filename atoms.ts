@@ -70,9 +70,11 @@ export class Nand implements IBox {
         setOutputDom(this.ele, 0, this.state);
 
         this.outputs[0].forEach(c => {
-          c.line.setOptions({
-            color: this.state ? 'red' : 'grey',
-          });
+          if (c.line) {
+            c.line.setOptions({
+              color: this.state ? 'red' : 'grey',
+            });
+          }
         });
 
         this.outputs[0].forEach(o => {
@@ -223,9 +225,11 @@ export class SourceSwitch implements IBox {
       setOutputDom(this.ele, 0, v);
 
       this.outputs.forEach(c => {
-        c.line.setOptions({
-          color: this.state ? 'red' : 'grey',
-        });
+        if (c.line) {
+          c.line.setOptions({
+            color: this.state ? 'red' : 'grey',
+          });
+        }
       });
     }
   }
@@ -297,13 +301,13 @@ export class Indicator implements IBox {
   rendered: boolean;
   ele?: HTMLElement;
   private draggable: PlainDraggable;
-	forwardingList: InputConnection[];
+  forwardingList: InputConnection[];
 
   constructor(app: App, rendered: boolean, id?: string) {
     this.id = id || (Math.random() + 1).toString(36).substring(7);
     this.state = false;
     this.rendered = rendered;
-		this.forwardingList = [];
+    this.forwardingList = [];
 
     if (rendered) {
       const canvasDiv = document.getElementById('canvas');
@@ -313,7 +317,9 @@ export class Indicator implements IBox {
       this.draggable = new PlainDraggable(this.ele);
       this.draggable.snap = { step: 45 };
       this.draggable.onMove = () => {
-        this.input.line.position();
+        if (this.input && this.input.line) {
+          this.input.line.position();
+        }
       };
     }
   }
@@ -330,9 +336,9 @@ export class Indicator implements IBox {
     if (v != this.state) {
       this.state = v;
       setInputDom(this.ele, i, v);
-			this.forwardingList.forEach(ic => {
-				ic.box.setInput(ic.index, v);
-			});
+      this.forwardingList.forEach(ic => {
+        ic.box.setInput(ic.index, v);
+      });
     }
   }
 

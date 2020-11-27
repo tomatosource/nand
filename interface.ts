@@ -45,7 +45,7 @@ interface E {
   n2Index: number;
 }
 
-enum AtomType {
+export enum AtomType {
   BB,
   NAND,
   I,
@@ -97,24 +97,27 @@ export class BlackBox implements IBox {
   ) {
     this.id = id;
     this.rendered = rendered;
+		this.outputs = [];
     this.inputs = [];
 		this.inputConnections = [];
+		this.outputConnections = [];
 		this.childInputs = [];
 		this.childOutputs= [];
+		this.children = [];
     this.outputs = [];
-    this.state = true;
     this.graph = graph;
     this.label = label;
-		this.outputs = [];
 
-    const inputCount = graph.nodes.filter(n => (n.kind = AtomType.I)).length;
-    const outputCount = graph.nodes.filter(n => (n.kind = AtomType.O)).length;
+    const inputCount = graph.nodes.filter(n => (n.kind === AtomType.I)).length;
+		console.log(graph);
+    const outputCount = graph.nodes.filter(n => (n.kind === AtomType.O)).length;
 		for (let i=0; i<outputCount; i++) {
 			this.outputs.push(false);
 			this.outputConnections.push([]);
 		}
 		for (let i=0; i<inputCount; i++) {
 			this.inputs.push(false);
+			this.inputConnections = [undefined];
 		}
 
     graph.nodes.forEach(n => {
@@ -154,7 +157,6 @@ export class BlackBox implements IBox {
       const canvasDiv = document.getElementById('canvas');
       this.ele = buildBoxHTML(app, this, inputCount, outputCount, label);
       canvasDiv.appendChild(this.ele);
-      setOutputDom(this.ele, 0, this.state);
       this.draggable = new PlainDraggable(this.ele);
       this.draggable.snap = { step: 45 };
       // on drag sync up lines
