@@ -15,16 +15,8 @@ export class App {
       return;
     }
 
-    const state = this.selectionIsInput
-      ? this.selectedBox.getInputState(this.selectedIndex)
-      : this.selectedBox.getOutputState(this.selectedIndex);
+    this.selectedBox.clearSelection(this.selectionIsInput, this.selectedIndex);
 
-    const ioContainers = this.selectedBox.ele.querySelectorAll('.ioContainer');
-    const conns = this.selectionIsInput
-      ? ioContainers[0].querySelectorAll('.connector')
-      : ioContainers[1].querySelectorAll('.connector');
-
-    conns[this.selectedIndex].className = `connector ${state ? 'on' : 'off'}`;
     this.selectedBox = undefined;
     this.selectedIndex = 0;
     this.selectionIsInput = false;
@@ -58,7 +50,8 @@ export class Connection {
   sourceIndex: number;
   destinationBox: IBox;
   destinationIndex: number;
-  line: LeaderLine;
+  line?: LeaderLine;
+  rendered: boolean;
 
   constructor(
     sourceBox: IBox,
@@ -66,35 +59,38 @@ export class Connection {
     destinationBox: IBox,
     destinationIndex: number,
     initValue: boolean,
+    rendered: boolean,
   ) {
     this.id = (Math.random() + 1).toString(36).substring(7);
     this.sourceBox = sourceBox;
     this.sourceIndex = sourceIndex;
     this.destinationBox = destinationBox;
     this.destinationIndex = destinationIndex;
+    this.rendered = rendered;
 
     destinationBox.setInput(destinationIndex, initValue);
 
-    const sourceIOContainers = sourceBox.ele.querySelectorAll('.ioContainer');
-    const sourceConns = sourceIOContainers[1].querySelectorAll('.connector');
-    const destIOContainers = destinationBox.ele.querySelectorAll(
-      '.ioContainer',
-    );
-    const destConns = destIOContainers[0].querySelectorAll('.connector');
-    this.line = new LeaderLine(
-      sourceConns[sourceIndex],
-      destConns[destinationIndex],
-      {
-        startSocket: 'right',
-        endSocket: 'left',
-        color: initValue ? 'red' : 'grey',
-        endPlug: 'disc',
-        startPlug: 'disc',
-      },
-    );
+    if (rendered) {
+      const sourceIOContainers = sourceBox.ele.querySelectorAll('.ioContainer');
+      const sourceConns = sourceIOContainers[1].querySelectorAll('.connector');
+      const destIOContainers = destinationBox.ele.querySelectorAll(
+        '.ioContainer',
+      );
+      const destConns = destIOContainers[0].querySelectorAll('.connector');
+      this.line = new LeaderLine(
+        sourceConns[sourceIndex],
+        destConns[destinationIndex],
+        {
+          startSocket: 'right',
+          endSocket: 'left',
+          color: initValue ? 'red' : 'grey',
+          endPlug: 'disc',
+          startPlug: 'disc',
+        },
+      );
+    }
   }
 }
-
 
 class Canvas {
   app: App;
@@ -106,9 +102,7 @@ class Canvas {
   }
 
   remove(box: IBox) {
-    box.removeAllConnections();
-    box.draggable.remove();
-    box.ele.remove();
+		box.clean();
     const id = box.id;
 
     this.children = this.children.filter(c => c.id !== id);
@@ -139,15 +133,15 @@ function setupKeys() {
         break;
       }
       case 'n': {
-        app.canvas.children.push(new Nand(app));
+        app.canvas.children.push(new Nand(app, true));
         break;
       }
       case 'i': {
-        app.canvas.children.push(new SourceSwitch(app));
+        app.canvas.children.push(new SourceSwitch(app, true));
         break;
       }
       case 'o': {
-        app.canvas.children.push(new Indicator(app));
+        app.canvas.children.push(new Indicator(app, true));
         break;
       }
       case 'x': {

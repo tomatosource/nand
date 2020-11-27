@@ -103,3 +103,21 @@ function newDivWithClass(className: string): HTMLElement {
   div.className = className;
   return div;
 }
+
+export function clearSelectionFromBox(
+  box: IBox,
+  isInput: boolean,
+  selectedIndex: number,
+) {
+  if (!this.rendered || box.ele == undefined) {
+    return;
+  }
+  const state = isInput
+    ? box.getInputState(selectedIndex)
+    : box.getOutputState(selectedIndex);
+  const ioContainers = box.ele.querySelectorAll('.ioContainer');
+  const conns = isInput
+    ? ioContainers[0].querySelectorAll('.connector')
+    : ioContainers[1].querySelectorAll('.connector');
+  conns[selectedIndex].className = `connector ${state ? 'on' : 'off'}`;
+}

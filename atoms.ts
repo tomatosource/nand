@@ -1,6 +1,11 @@
 import { Connection, App } from './main';
 import { IBox } from './interface';
-import { setOutputDom, setInputDom, buildBoxHTML } from './utils';
+import {
+  clearSelectionFromBox,
+  setOutputDom,
+  setInputDom,
+  buildBoxHTML,
+} from './utils';
 import LeaderLine from 'leader-line';
 import PlainDraggable from 'plain-draggable';
 
@@ -9,38 +14,42 @@ export class Nand implements IBox {
   inputs: boolean[];
   inputConnections: Connection[];
   outputs: Connection[][];
-  ele: HTMLElement;
   state: boolean;
-  draggable: PlainDraggable;
+  rendered: boolean;
+  ele?: HTMLElement;
+  private draggable: PlainDraggable;
 
-  constructor(app: App) {
+  constructor(app: App, rendered: boolean) {
     this.id = (Math.random() + 1).toString(36).substring(7);
+    this.rendered = rendered;
     this.inputs = [false, false];
     this.inputConnections = [undefined, undefined];
     this.outputs = [[]];
     this.state = true;
 
-    const canvasDiv = document.getElementById('canvas');
-    this.ele = buildBoxHTML(app, this, 2, 1, 'NAND');
-    canvasDiv.appendChild(this.ele);
-    setOutputDom(this.ele, 0, this.state);
-    this.draggable = new PlainDraggable(this.ele);
-    this.draggable.snap = { step: 45 };
-    // on drag sync up lines
-    this.draggable.onMove = () => {
-      this.inputConnections.forEach(c => {
-        if (c && c.line) {
-          c.line.position();
-        }
-      });
-      this.outputs.forEach(o => {
-        o.forEach(c => {
+    if (rendered) {
+      const canvasDiv = document.getElementById('canvas');
+      this.ele = buildBoxHTML(app, this, 2, 1, 'NAND');
+      canvasDiv.appendChild(this.ele);
+      setOutputDom(this.ele, 0, this.state);
+      this.draggable = new PlainDraggable(this.ele);
+      this.draggable.snap = { step: 45 };
+      // on drag sync up lines
+      this.draggable.onMove = () => {
+        this.inputConnections.forEach(c => {
           if (c && c.line) {
             c.line.position();
           }
         });
-      });
-    };
+        this.outputs.forEach(o => {
+          o.forEach(c => {
+            if (c && c.line) {
+              c.line.position();
+            }
+          });
+        });
+      };
+    }
   }
 
   getOutputState(_: number): boolean {
@@ -88,6 +97,7 @@ export class Nand implements IBox {
       this,
       inputIndex,
       sourceBox.getOutputState(sourceIndex),
+      this.rendered,
     );
     this.inputConnections[inputIndex] = conn;
     sourceBox.addOutputConnection(conn, sourceIndex);
@@ -104,7 +114,9 @@ export class Nand implements IBox {
     const conn = this.inputConnections[i];
     if (conn != undefined) {
       conn.sourceBox.removeOutputConnection(conn.sourceIndex, conn.id);
-      conn.line.remove();
+      if (conn.rendered) {
+        conn.line.remove();
+      }
       this.inputConnections[i] = undefined;
     }
   }
@@ -136,8 +148,23 @@ export class Nand implements IBox {
   getInputCount(): number {
     return 2;
   }
+
   getOutputCount(): number {
     return 1;
+  }
+
+  clearSelection(isInput: boolean, selectedIndex: number) {
+    clearSelectionFromBox(this, isInput, selectedIndex);
+  }
+
+  clean() {
+    this.removeAllConnections();
+    if (this.draggable !== undefined) {
+      this.draggable.remove();
+    }
+    if (this.ele !== undefined) {
+      this.ele.remove();
+    }
   }
 }
 
@@ -145,34 +172,38 @@ export class SourceSwitch implements IBox {
   id: string;
   state: boolean;
   outputs: Connection[];
-  ele: HTMLElement;
-  draggable: PlainDraggable;
+  rendered: boolean;
+  ele?: HTMLElement;
+  private draggable: PlainDraggable;
 
-  constructor(app: App) {
+  constructor(app: App, rendered: boolean) {
     this.id = (Math.random() + 1).toString(36).substring(7);
     this.state = false;
     this.outputs = [];
+    this.rendered = rendered;
 
-    const canvasDiv = document.getElementById('canvas');
-    this.ele = buildBoxHTML(app, this, 0, 1, 'SS');
+    if (rendered) {
+      const canvasDiv = document.getElementById('canvas');
+      this.ele = buildBoxHTML(app, this, 0, 1, 'SS');
 
-    this.ele.addEventListener('click', e => {
-      this.toggle(e);
-      app.clearSelection();
-      e.stopPropagation();
-    });
-    this.ele.className = 'box switch';
-    canvasDiv.appendChild(this.ele);
-
-    this.draggable = new PlainDraggable(this.ele);
-    this.draggable.onMove = () => {
-      this.outputs.forEach(c => {
-        if (c && c.line) {
-          c.line.position();
-        }
+      this.ele.addEventListener('click', e => {
+        this.toggle(e);
+        app.clearSelection();
+        e.stopPropagation();
       });
-    };
-    this.draggable.snap = { step: 45 };
+      this.ele.className = 'box switch';
+      canvasDiv.appendChild(this.ele);
+
+      this.draggable = new PlainDraggable(this.ele);
+      this.draggable.onMove = () => {
+        this.outputs.forEach(c => {
+          if (c && c.line) {
+            c.line.position();
+          }
+        });
+      };
+      this.draggable.snap = { step: 45 };
+    }
   }
 
   getOutputState(_: number): boolean {
@@ -239,31 +270,50 @@ export class SourceSwitch implements IBox {
   getInputCount(): number {
     return 0;
   }
+
   getOutputCount(): number {
     return 1;
+  }
+
+  clearSelection(isInput: boolean, selectedIndex: number) {
+    clearSelectionFromBox(this, isInput, selectedIndex);
+  }
+
+  clean() {
+    this.removeAllConnections();
+    if (this.draggable !== undefined) {
+      this.draggable.remove();
+    }
+    if (this.ele !== undefined) {
+      this.ele.remove();
+    }
   }
 }
 
 export class Indicator implements IBox {
   id: string;
   state: boolean;
-  ele: HTMLElement;
   input?: Connection;
-  draggable: PlainDraggable;
+  rendered: boolean;
+  ele?: HTMLElement;
+  private draggable: PlainDraggable;
 
-  constructor(app: App) {
+  constructor(app: App, rendered: boolean) {
     this.id = (Math.random() + 1).toString(36).substring(7);
     this.state = false;
+    this.rendered = rendered;
 
-    const canvasDiv = document.getElementById('canvas');
-    this.ele = buildBoxHTML(app, this, 1, 0, '');
-    canvasDiv.appendChild(this.ele);
+    if (rendered) {
+      const canvasDiv = document.getElementById('canvas');
+      this.ele = buildBoxHTML(app, this, 1, 0, '');
+      canvasDiv.appendChild(this.ele);
 
-    this.draggable = new PlainDraggable(this.ele);
-    this.draggable.snap = { step: 45 };
-    this.draggable.onMove = () => {
-      this.input.line.position();
-    };
+      this.draggable = new PlainDraggable(this.ele);
+      this.draggable.snap = { step: 45 };
+      this.draggable.onMove = () => {
+        this.input.line.position();
+      };
+    }
   }
 
   getOutputState(_: number): boolean {
@@ -296,6 +346,7 @@ export class Indicator implements IBox {
       this,
       inputIndex,
       sourceBox.getOutputState(sourceIndex),
+      this.rendered,
     );
     this.input = conn;
     sourceBox.addOutputConnection(conn, sourceIndex);
@@ -318,12 +369,28 @@ export class Indicator implements IBox {
   }
 
   removeOutputConnection(i: number, id: string) {}
+
   clearOutput(i: number) {}
 
   getInputCount(): number {
     return 1;
   }
+
   getOutputCount(): number {
     return 0;
+  }
+
+  clearSelection(isInput: boolean, selectedIndex: number) {
+    clearSelectionFromBox(this, isInput, selectedIndex);
+  }
+
+  clean() {
+    this.removeAllConnections();
+    if (this.draggable !== undefined) {
+      this.draggable.remove();
+    }
+    if (this.ele !== undefined) {
+      this.ele.remove();
+    }
   }
 }
