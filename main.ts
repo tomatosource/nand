@@ -1,7 +1,7 @@
-import LeaderLine from 'leader-line';
-import PlainDraggable from 'plain-draggable';
 import { IBox } from './interface';
 import { setOutputDom, setInputDom, buildBoxHTML } from './utils';
+import LeaderLine from 'leader-line';
+import PlainDraggable from 'plain-draggable';
 
 export class App {
   canvas: Canvas;
@@ -39,6 +39,15 @@ export class App {
       this.selectedBox.clearOutput(this.selectedIndex);
     }
     this.clearSelection();
+  }
+
+  deleteActiveBox() {
+    if (this.selectedBox == undefined) {
+      return;
+    }
+    const selected = this.selectedBox;
+    this.clearSelection();
+    this.canvas.remove(selected);
   }
 }
 
@@ -86,7 +95,7 @@ export class Connection {
 }
 
 class Nand implements IBox {
-	id: string;
+  id: string;
   inputs: boolean[];
   inputConnections: Connection[];
   outputs: Connection[][];
@@ -154,9 +163,9 @@ class Nand implements IBox {
     }
   }
 
-  addInputConnection(sourceBox: IBox, sourceIndex: number, inputIndex: number) {
+  addInputConnection(sourceBox: IBox, sourceIndex: number, inputIndex: number): boolean {
     if (this.inputConnections[inputIndex] != undefined) {
-      return;
+      return false;
     }
 
     const conn = new Connection(
@@ -169,6 +178,8 @@ class Nand implements IBox {
     this.inputConnections[inputIndex] = conn;
     sourceBox.addOutputConnection(conn, sourceIndex);
     this.setInput(inputIndex, sourceBox.getOutputState(sourceIndex));
+
+		return true;
   }
 
   addOutputConnection(conn: Connection, index: number) {
@@ -188,6 +199,15 @@ class Nand implements IBox {
     this.outputs[i] = this.outputs[i].filter(c => c.id != id);
   }
 
+  removeAllConnections() {
+    this.inputs.forEach((_, i) => {
+      this.removeInputConnection(i);
+    });
+    this.outputs.forEach((_, i) => {
+      this.clearOutput(i);
+    });
+  }
+
   clearOutput(i: number) {
     while (true) {
       if (this.outputs[i].length > 0) {
@@ -201,17 +221,18 @@ class Nand implements IBox {
 }
 
 class SourceSwitch implements IBox {
-	id: string;
+  id: string;
   state: boolean;
   outputs: Connection[];
   ele: HTMLElement;
+  draggable: PlainDraggable;
 
   constructor(app: App) {
     this.id = (Math.random() + 1).toString(36).substring(7);
     this.state = false;
     this.outputs = [];
 
-    const switchesContainer = document.getElementById('switchesContainer');
+    const canvasDiv = document.getElementById('canvas');
     this.ele = buildBoxHTML(app, this, 0, 1, 'SS');
 
     this.ele.addEventListener('click', e => {
@@ -220,7 +241,17 @@ class SourceSwitch implements IBox {
       e.stopPropagation();
     });
     this.ele.className = 'box switch';
-    switchesContainer.appendChild(this.ele);
+    canvasDiv.appendChild(this.ele);
+
+    this.draggable = new PlainDraggable(this.ele);
+    this.draggable.onMove = () => {
+      this.outputs.forEach(c => {
+        if (c && c.line) {
+          c.line.position();
+        }
+      });
+    };
+		this.draggable.snap = { step: 45 };
   }
 
   getOutputState(_: number): boolean {
@@ -255,7 +286,9 @@ class SourceSwitch implements IBox {
     sourceBox: IBox,
     sourceIndex: number,
     inputIndex: number,
-  ) {}
+  ): boolean {
+		return false;
+	}
 
   addOutputConnection(conn: Connection, _: number) {
     this.outputs.push(conn);
@@ -277,21 +310,32 @@ class SourceSwitch implements IBox {
       }
     }
   }
+
+  removeAllConnections() {
+    this.clearOutput(0);
+  }
 }
 
 class Indicator implements IBox {
-	id: string;
+  id: string;
   state: boolean;
   ele: HTMLElement;
   input?: Connection;
+  draggable: PlainDraggable;
 
   constructor(app: App) {
     this.id = (Math.random() + 1).toString(36).substring(7);
     this.state = false;
 
-    const switchesContainer = document.getElementById('indicatorsContainer');
+    const canvasDiv = document.getElementById('canvas');
     this.ele = buildBoxHTML(app, this, 1, 0, '');
-    switchesContainer.appendChild(this.ele);
+    canvasDiv.appendChild(this.ele);
+
+    this.draggable = new PlainDraggable(this.ele);
+		this.draggable.snap = { step: 45 };
+    this.draggable.onMove = () => {
+      this.input.line.position();
+		};
   }
 
   getOutputState(_: number): boolean {
@@ -309,9 +353,9 @@ class Indicator implements IBox {
     }
   }
 
-  addInputConnection(sourceBox: IBox, sourceIndex: number, inputIndex: number) {
+  addInputConnection(sourceBox: IBox, sourceIndex: number, inputIndex: number): boolean{
     if (this.input != undefined) {
-      return;
+      return false;
     }
 
     const conn = new Connection(
@@ -324,6 +368,8 @@ class Indicator implements IBox {
     this.input = conn;
     sourceBox.addOutputConnection(conn, sourceIndex);
     this.setInput(inputIndex, sourceBox.getOutputState(sourceIndex));
+
+		return true;
   }
 
   addOutputConnection(conn: Connection, index: number) {}
@@ -335,33 +381,46 @@ class Indicator implements IBox {
     this.input = undefined;
   }
 
+  removeAllConnections() {
+    this.removeInputConnection(0);
+  }
+
   removeOutputConnection(i: number, id: string) {}
   clearOutput(i: number) {}
 }
 
 class Canvas {
+  app: App;
   inputs: SourceSwitch[];
   outputs: Indicator[];
   children: IBox[];
 
-  constructor(app: App, inputCount: number, outputCount: number) {
-    this.inputs = Array.apply(null, new Array(inputCount)).map(
-      () => new SourceSwitch(app),
-    );
-    this.outputs = Array.apply(null, new Array(outputCount)).map(
-      () => new Indicator(app),
-    );
+  constructor(app: App) {
+    this.app = app;
     this.children = [];
+    this.inputs = [];
+    this.outputs = [];
   }
 
   toggle(i: number) {
     this.inputs[i].toggle(null);
   }
+
+  remove(box: IBox) {
+    box.removeAllConnections();
+    box.draggable.remove();
+    box.ele.remove();
+    const id = box.id;
+
+    this.inputs = this.inputs.filter(i => i.id !== id);
+    this.outputs = this.outputs.filter(o => o.id !== id);
+    this.children = this.children.filter(c => c.id !== id);
+  }
 }
 
 function main() {
   // new 2in/1out canvas
-  const c = new Canvas(app, 2, 1);
+  const c = new Canvas(app);
   app.canvas = c;
 
   setupKeys();
@@ -382,8 +441,20 @@ function setupKeys() {
         app.clearSelection();
         break;
       }
-      case 's': {
+      case 'n': {
         app.canvas.children.push(new Nand(app));
+        break;
+      }
+      case 'i': {
+        app.canvas.inputs.push(new SourceSwitch(app));
+        break;
+      }
+      case 'o': {
+        app.canvas.outputs.push(new Indicator(app));
+        break;
+      }
+      case 'x': {
+        app.deleteActiveBox();
         break;
       }
     }

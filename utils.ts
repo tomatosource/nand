@@ -14,7 +14,7 @@ export function setInputDom(ele: HTMLElement, index: number, state: boolean) {
 }
 
 export function buildBoxHTML(
-	app: App,
+  app: App,
   box: IBox,
   inputs: number,
   outputs: number,
@@ -36,7 +36,19 @@ export function buildBoxHTML(
         input.className += ' active';
         e.stopPropagation();
       } else if (!app.selectionIsInput) {
-        box.addInputConnection(app.selectedBox, app.selectedIndex, i);
+        const ok = box.addInputConnection(
+          app.selectedBox,
+          app.selectedIndex,
+          i,
+        );
+        if (!ok) {
+          app.clearSelection();
+          app.selectedBox = box;
+          app.selectedIndex = i;
+          app.selectionIsInput = true;
+          input.className += ' active';
+          e.stopPropagation();
+        }
       }
     });
 
@@ -61,8 +73,21 @@ export function buildBoxHTML(
         output.className += ' active';
         e.stopPropagation();
       } else if (app.selectionIsInput) {
-        app.selectedBox.addInputConnection(box, i, app.selectedIndex);
-        app.clearSelection();
+        const ok = app.selectedBox.addInputConnection(
+          box,
+          i,
+          app.selectedIndex,
+        );
+        if (ok) {
+          app.clearSelection();
+        } else {
+          app.clearSelection();
+          app.selectedBox = box;
+          app.selectedIndex = i;
+          app.selectionIsInput = false;
+          output.className += ' active';
+          e.stopPropagation();
+        }
       }
     });
   }
