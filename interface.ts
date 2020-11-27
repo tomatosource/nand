@@ -2,7 +2,7 @@ import { Connection } from './main';
 import PlainDraggable from 'plain-draggable';
 
 export interface IBox {
-	id: string;
+  id: string;
   ele: HTMLElement;
   draggable: PlainDraggable;
 
@@ -20,4 +20,3 @@ export interface IBox {
   clearOutput(index: number): void;
   removeAllConnections(): void;
 }
-

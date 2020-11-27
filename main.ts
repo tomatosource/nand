@@ -163,7 +163,11 @@ class Nand implements IBox {
     }
   }
 
-  addInputConnection(sourceBox: IBox, sourceIndex: number, inputIndex: number): boolean {
+  addInputConnection(
+    sourceBox: IBox,
+    sourceIndex: number,
+    inputIndex: number,
+  ): boolean {
     if (this.inputConnections[inputIndex] != undefined) {
       return false;
     }
@@ -179,7 +183,7 @@ class Nand implements IBox {
     sourceBox.addOutputConnection(conn, sourceIndex);
     this.setInput(inputIndex, sourceBox.getOutputState(sourceIndex));
 
-		return true;
+    return true;
   }
 
   addOutputConnection(conn: Connection, index: number) {
@@ -251,7 +255,7 @@ class SourceSwitch implements IBox {
         }
       });
     };
-		this.draggable.snap = { step: 45 };
+    this.draggable.snap = { step: 45 };
   }
 
   getOutputState(_: number): boolean {
@@ -287,8 +291,8 @@ class SourceSwitch implements IBox {
     sourceIndex: number,
     inputIndex: number,
   ): boolean {
-		return false;
-	}
+    return false;
+  }
 
   addOutputConnection(conn: Connection, _: number) {
     this.outputs.push(conn);
@@ -332,10 +336,10 @@ class Indicator implements IBox {
     canvasDiv.appendChild(this.ele);
 
     this.draggable = new PlainDraggable(this.ele);
-		this.draggable.snap = { step: 45 };
+    this.draggable.snap = { step: 45 };
     this.draggable.onMove = () => {
       this.input.line.position();
-		};
+    };
   }
 
   getOutputState(_: number): boolean {
@@ -353,7 +357,11 @@ class Indicator implements IBox {
     }
   }
 
-  addInputConnection(sourceBox: IBox, sourceIndex: number, inputIndex: number): boolean{
+  addInputConnection(
+    sourceBox: IBox,
+    sourceIndex: number,
+    inputIndex: number,
+  ): boolean {
     if (this.input != undefined) {
       return false;
     }
@@ -369,7 +377,7 @@ class Indicator implements IBox {
     sourceBox.addOutputConnection(conn, sourceIndex);
     this.setInput(inputIndex, sourceBox.getOutputState(sourceIndex));
 
-		return true;
+    return true;
   }
 
   addOutputConnection(conn: Connection, index: number) {}
