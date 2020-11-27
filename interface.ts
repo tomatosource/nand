@@ -63,20 +63,20 @@ interface N {
 }
 
 export class InputConnection {
-	box: IBox;
-	index: number;
+  box: IBox;
+  index: number;
 
-	constructor(box: IBox, index: number) {
-		this.box =  box;
-		this.index= index;
-	}
+  constructor(box: IBox, index: number) {
+    this.box = box;
+    this.index = index;
+  }
 }
 
 export class BlackBox implements IBox {
   id: string;
   inputs: boolean[];
-	outputs: boolean[];
-	inputConnections: Connection[];
+  outputs: boolean[];
+  inputConnections: Connection[];
   outputConnections: Connection[][];
   label: string;
   state: boolean;
@@ -97,28 +97,27 @@ export class BlackBox implements IBox {
   ) {
     this.id = id;
     this.rendered = rendered;
-		this.outputs = [];
+    this.outputs = [];
     this.inputs = [];
-		this.inputConnections = [];
-		this.outputConnections = [];
-		this.childInputs = [];
-		this.childOutputs= [];
-		this.children = [];
+    this.inputConnections = [];
+    this.outputConnections = [];
+    this.childInputs = [];
+    this.childOutputs = [];
+    this.children = [];
     this.outputs = [];
     this.graph = graph;
     this.label = label;
 
-    const inputCount = graph.nodes.filter(n => (n.kind === AtomType.I)).length;
-		console.log(graph);
-    const outputCount = graph.nodes.filter(n => (n.kind === AtomType.O)).length;
-		for (let i=0; i<outputCount; i++) {
-			this.outputs.push(false);
-			this.outputConnections.push([]);
-		}
-		for (let i=0; i<inputCount; i++) {
-			this.inputs.push(false);
-			this.inputConnections = [undefined];
-		}
+    const inputCount = graph.nodes.filter(n => n.kind === AtomType.I).length;
+    const outputCount = graph.nodes.filter(n => n.kind === AtomType.O).length;
+    for (let i = 0; i < outputCount; i++) {
+      this.outputs.push(false);
+      this.outputConnections.push([]);
+    }
+    for (let i = 0; i < inputCount; i++) {
+      this.inputs.push(false);
+      this.inputConnections = [undefined];
+    }
 
     graph.nodes.forEach(n => {
       switch (n.kind) {
@@ -147,11 +146,11 @@ export class BlackBox implements IBox {
       }
     });
 
-		graph.edges.forEach(e => {
-			const start = this.children.filter(c => c.id === e.n1)[0];
-			const end = this.children.filter(c => c.id === e.n2)[0];
-			start.addInputConnection(end, e.n2Index, e.n1Index);
-		});
+    graph.edges.forEach(e => {
+      const start = this.children.filter(c => c.id === e.n1)[0];
+      const end = this.children.filter(c => c.id === e.n2)[0];
+      start.addInputConnection(end, e.n2Index, e.n1Index);
+    });
 
     if (rendered) {
       const canvasDiv = document.getElementById('canvas');
@@ -174,6 +173,23 @@ export class BlackBox implements IBox {
           });
         });
       };
+
+      this.childOutputs.forEach((o, i) => {
+        o.callback = (newState: boolean) => {
+          this.outputs[i] = newState;
+          setOutputDom(this.ele, i, newState);
+
+          this.outputConnections.forEach(o => {
+            o.forEach(c => {
+              if (c.line) {
+                c.line.setOptions({
+                  color: newState ? 'red' : 'grey',
+                });
+              }
+            });
+          });
+        };
+      });
     }
   }
 
@@ -186,8 +202,12 @@ export class BlackBox implements IBox {
   }
 
   setInput(i: number, v: boolean): void {
-		this.childInputs[i].setInput(0, v);
-	}
+    if (this.inputs[i] != v) {
+      this.childInputs[i].setInput(0, v);
+      this.inputs[i] = v;
+      setInputDom(this.ele, i, v);
+    }
+  }
 
   addInputConnection(
     sourceBox: IBox,
@@ -211,12 +231,14 @@ export class BlackBox implements IBox {
     this.setInput(inputIndex, sourceBox.getOutputState(sourceIndex));
 
     return true;
-	}
+  }
 
   addOutputConnection(conn: Connection, index: number) {
     this.outputConnections[index].push(conn);
-		this.childOutputs[index].forwardingList.push(new InputConnection(conn.destinationBox, conn.destinationIndex));
-	}
+    this.childOutputs[index].forwardingList.push(
+      new InputConnection(conn.destinationBox, conn.destinationIndex),
+    );
+  }
 
   removeInputConnection(i: number) {
     const conn = this.inputConnections[i];
@@ -226,13 +248,18 @@ export class BlackBox implements IBox {
         conn.line.remove();
       }
       this.inputConnections[i] = undefined;
+      this.setInput(i, false);
     }
-	}
+  }
 
   removeOutputConnection(i: number, id: string) {
-    this.outputConnections[i] = this.outputConnections[i].filter(c => c.id != id);
-		this.childOutputs[i].forwardingList = this.childOutputs[i].forwardingList.filter(ic => ic.box.id != id);
-	}
+    this.outputConnections[i] = this.outputConnections[i].filter(
+      c => c.id != id,
+    );
+    this.childOutputs[i].forwardingList = this.childOutputs[
+      i
+    ].forwardingList.filter(ic => ic.box.id != id);
+  }
 
   removeAllConnections() {
     this.inputs.forEach((_, i) => {
@@ -241,18 +268,22 @@ export class BlackBox implements IBox {
     this.outputs.forEach((_, i) => {
       this.clearOutput(i);
     });
-	}
+  }
 
   clearOutput(i: number) {
-    while (true) {
+    let x = 0;
+    while (x < 500) {
+      x++;
       if (this.outputConnections[i].length > 0) {
         const conn = this.outputs[i][0];
-        conn.destinationBox.removeInputConnection(conn.destinationIndex);
+        if (conn != undefined) {
+          conn.destinationBox.removeInputConnection(conn.destinationIndex);
+        }
       } else {
         break;
       }
     }
-	}
+  }
 
   getInputCount(): number {
     return this.childOutputs.length;

@@ -121,6 +121,7 @@ export class Nand implements IBox {
       }
       this.inputConnections[i] = undefined;
     }
+    this.setInput(i, false);
   }
 
   removeOutputConnection(i: number, id: string) {
@@ -156,6 +157,7 @@ export class Nand implements IBox {
   }
 
   clearSelection(isInput: boolean, selectedIndex: number) {
+    console.log('clear');
     clearSelectionFromBox(this, isInput, selectedIndex);
   }
 
@@ -302,12 +304,14 @@ export class Indicator implements IBox {
   ele?: HTMLElement;
   private draggable: PlainDraggable;
   forwardingList: InputConnection[];
+  callback: (state: boolean) => void;
 
   constructor(app: App, rendered: boolean, id?: string) {
     this.id = id || (Math.random() + 1).toString(36).substring(7);
     this.state = false;
     this.rendered = rendered;
     this.forwardingList = [];
+    this.callback = () => {};
 
     if (rendered) {
       const canvasDiv = document.getElementById('canvas');
@@ -339,6 +343,7 @@ export class Indicator implements IBox {
       this.forwardingList.forEach(ic => {
         ic.box.setInput(ic.index, v);
       });
+      this.callback(v);
     }
   }
 
@@ -373,6 +378,7 @@ export class Indicator implements IBox {
     conn.sourceBox.removeOutputConnection(conn.sourceIndex, conn.id);
     conn.line.remove();
     this.input = undefined;
+    this.setInput(i, false);
   }
 
   removeAllConnections() {
@@ -403,5 +409,9 @@ export class Indicator implements IBox {
     if (this.ele !== undefined) {
       this.ele.remove();
     }
+  }
+
+  getState(): boolean {
+    return this.state;
   }
 }

@@ -2,18 +2,18 @@ import { IBox } from './interface';
 import { App } from './main';
 
 export function setOutputDom(ele: HTMLElement, index: number, state: boolean) {
-	if (ele === undefined) {
-		return
-	}
+  if (ele === undefined) {
+    return;
+  }
   const ioContainers = ele.querySelectorAll('.ioContainer');
   const conns = ioContainers[1].querySelectorAll('.connector');
   conns[index].className = `connector ${state ? 'on' : 'off'}`;
 }
 
 export function setInputDom(ele: HTMLElement, index: number, state: boolean) {
-	if (ele === undefined) {
-		return
-	}
+  if (ele === undefined) {
+    return;
+  }
   const ioContainers = ele.querySelectorAll('.ioContainer');
   const conns = ioContainers[0].querySelectorAll('.connector');
   conns[index].className = `connector ${state ? 'on' : 'off'}`;
@@ -115,7 +115,7 @@ export function clearSelectionFromBox(
   isInput: boolean,
   selectedIndex: number,
 ) {
-  if (!this.rendered || box.ele == undefined) {
+  if (!box.rendered || box.ele == undefined) {
     return;
   }
   const state = isInput
