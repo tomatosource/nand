@@ -10,13 +10,18 @@ parcel index.html
 
 ## TODO
 
- - save canvas as G, add to list
- - create BB from list
- - load BB as canvas
  - save/load BBs between sessions
+ - ux improvements
+   - render labels
+	 - source switch styles
+	 - indicator styles
+	 - new BB
+ - refactor/organise code
+ - load BB as canvas
  - delete saved Gs
  - document pins (use as ordering)
    - active pin (key: e)
+ - document chip
  - fixed sources
  - clock
  - new canvas

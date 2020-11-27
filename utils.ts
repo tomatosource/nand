@@ -47,8 +47,8 @@ export function buildBoxHTML(
           app.selectedIndex,
           i,
         );
+        app.clearSelection();
         if (!ok) {
-          app.clearSelection();
           app.selectedBox = box;
           app.selectedIndex = i;
           app.selectionIsInput = true;
@@ -84,9 +84,8 @@ export function buildBoxHTML(
           i,
           app.selectedIndex,
         );
-        if (ok) {
-          app.clearSelection();
-        } else {
+        app.clearSelection();
+        if (!ok) {
           app.clearSelection();
           app.selectedBox = box;
           app.selectedIndex = i;
