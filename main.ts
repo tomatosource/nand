@@ -1,7 +1,9 @@
 import LeaderLine from 'leader-line';
 import PlainDraggable from 'plain-draggable';
+import { IBox } from './interface';
+import { setOutputDom, setInputDom, buildBoxHTML } from './utils';
 
-class App {
+export class App {
   canvas: Canvas;
   selectedBox: IBox;
   selectedIndex: number;
@@ -40,23 +42,7 @@ class App {
   }
 }
 
-interface IBox {
-  ele: HTMLElement;
-  setInput(i: number, v: boolean): void;
-  getOutputState(i: number): boolean;
-  getInputState(i: number): boolean;
-  addInputConnection(
-    sourceBox: IBox,
-    sourceIndex: number,
-    inputIndex: number,
-  ): void;
-  addOutputConnection(connection: Connection, index: number): void;
-  removeInputConnection(index: number): void;
-  removeOutputConnection(index: number, id: string): void;
-  clearOutput(index: number): void;
-}
-
-class Connection {
+export class Connection {
   id: string;
   sourceBox: IBox;
   sourceIndex: number;
@@ -100,6 +86,7 @@ class Connection {
 }
 
 class Nand implements IBox {
+	id: string;
   inputs: boolean[];
   inputConnections: Connection[];
   outputs: Connection[][];
@@ -107,19 +94,20 @@ class Nand implements IBox {
   state: boolean;
   draggable: PlainDraggable;
 
-  constructor() {
+  constructor(app: App) {
+    this.id = (Math.random() + 1).toString(36).substring(7);
     this.inputs = [false, false];
     this.inputConnections = [undefined, undefined];
     this.outputs = [[]];
     this.state = true;
 
     const canvasDiv = document.getElementById('canvas');
-    this.ele = buildBoxHTML(this, 2, 1, 'NAND');
+    this.ele = buildBoxHTML(app, this, 2, 1, 'NAND');
     canvasDiv.appendChild(this.ele);
     setOutputDom(this.ele, 0, this.state);
     this.draggable = new PlainDraggable(this.ele);
-		this.draggable.snap = {step: 15};
-		// on drag sync up lines
+    this.draggable.snap = { step: 45 };
+    // on drag sync up lines
     this.draggable.onMove = () => {
       this.inputConnections.forEach(c => {
         if (c && c.line) {
@@ -213,16 +201,18 @@ class Nand implements IBox {
 }
 
 class SourceSwitch implements IBox {
+	id: string;
   state: boolean;
   outputs: Connection[];
   ele: HTMLElement;
 
-  constructor() {
+  constructor(app: App) {
+    this.id = (Math.random() + 1).toString(36).substring(7);
     this.state = false;
     this.outputs = [];
 
     const switchesContainer = document.getElementById('switchesContainer');
-    this.ele = buildBoxHTML(this, 0, 1, 'SS');
+    this.ele = buildBoxHTML(app, this, 0, 1, 'SS');
 
     this.ele.addEventListener('click', e => {
       this.toggle(e);
@@ -289,28 +279,18 @@ class SourceSwitch implements IBox {
   }
 }
 
-function setOutputDom(ele: HTMLElement, index: number, state: boolean) {
-  const ioContainers = ele.querySelectorAll('.ioContainer');
-  const conns = ioContainers[1].querySelectorAll('.connector');
-  conns[index].className = `connector ${state ? 'on' : 'off'}`;
-}
-
-function setInputDom(ele: HTMLElement, index: number, state: boolean) {
-  const ioContainers = ele.querySelectorAll('.ioContainer');
-  const conns = ioContainers[0].querySelectorAll('.connector');
-  conns[index].className = `connector ${state ? 'on' : 'off'}`;
-}
-
 class Indicator implements IBox {
+	id: string;
   state: boolean;
   ele: HTMLElement;
   input?: Connection;
 
-  constructor() {
+  constructor(app: App) {
+    this.id = (Math.random() + 1).toString(36).substring(7);
     this.state = false;
 
     const switchesContainer = document.getElementById('indicatorsContainer');
-    this.ele = buildBoxHTML(this, 1, 0, '');
+    this.ele = buildBoxHTML(app, this, 1, 0, '');
     switchesContainer.appendChild(this.ele);
   }
 
@@ -364,12 +344,12 @@ class Canvas {
   outputs: Indicator[];
   children: IBox[];
 
-  constructor(inputCount: number, outputCount: number) {
+  constructor(app: App, inputCount: number, outputCount: number) {
     this.inputs = Array.apply(null, new Array(inputCount)).map(
-      () => new SourceSwitch(),
+      () => new SourceSwitch(app),
     );
     this.outputs = Array.apply(null, new Array(outputCount)).map(
-      () => new Indicator(),
+      () => new Indicator(app),
     );
     this.children = [];
   }
@@ -379,84 +359,10 @@ class Canvas {
   }
 }
 
-function buildBoxHTML(
-  box: IBox,
-  inputs: number,
-  outputs: number,
-  label: string,
-): HTMLElement {
-  const container = newDivWithClass('box');
-
-  const inputsContainer = newDivWithClass('ioContainer');
-  for (let i = 0; i < inputs; i++) {
-    const input = newDivWithClass('connector');
-    inputsContainer.appendChild(input);
-
-    input.addEventListener('click', e => {
-      if (app.selectedBox == undefined || app.selectionIsInput) {
-        app.clearSelection();
-        app.selectedBox = box;
-        app.selectedIndex = i;
-        app.selectionIsInput = true;
-        input.className += ' active';
-        e.stopPropagation();
-      } else if (!app.selectionIsInput) {
-        box.addInputConnection(app.selectedBox, app.selectedIndex, i);
-        app.clearSelection();
-      }
-    });
-
-    if (i < inputs - 1) {
-      const spacer = newDivWithClass('connectorSpacer');
-      inputsContainer.appendChild(spacer);
-    }
-  }
-
-  const outputsContainer = newDivWithClass('ioContainer');
-  for (let i = 0; i < outputs; i++) {
-    const output = newDivWithClass('connector off');
-    outputsContainer.appendChild(output);
-
-    output.addEventListener('click', e => {
-      e.stopPropagation();
-      if (app.selectedBox == undefined || !app.selectionIsInput) {
-        app.clearSelection();
-        app.selectedBox = box;
-        app.selectedIndex = i;
-        app.selectionIsInput = false;
-        output.className += ' active';
-        e.stopPropagation();
-      } else if (app.selectionIsInput) {
-        app.selectedBox.addInputConnection(box, i, app.selectedIndex);
-        app.clearSelection();
-      }
-    });
-  }
-
-  container.appendChild(inputsContainer);
-  container.appendChild(outputsContainer);
-
-  return container;
-}
-
-function newDivWithClass(className: string): HTMLElement {
-  const div = document.createElement('div');
-  div.className = className;
-  return div;
-}
-
 function main() {
   // new 2in/1out canvas
-  const c = new Canvas(2, 1);
+  const c = new Canvas(app, 2, 1);
   app.canvas = c;
-
-  // create and add nand to canvas
-  let n = new Nand();
-  c.children.push(n);
-  n = new Nand();
-  c.children.push(n);
-  n = new Nand();
-  c.children.push(n);
 
   setupKeys();
 }
@@ -466,12 +372,19 @@ function setupKeys() {
     switch (e.key) {
       case 'Backspace': {
         app.deleteActiveConnections();
+        break;
       }
       case 'Delete': {
         app.deleteActiveConnections();
+        break;
       }
       case 'Escape': {
         app.clearSelection();
+        break;
+      }
+      case 's': {
+        app.canvas.children.push(new Nand(app));
+        break;
       }
     }
   });
