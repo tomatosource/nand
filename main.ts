@@ -9,7 +9,6 @@ import { Nand } from './nand';
 import { SourceSwitch } from './source_switch';
 import { Indicator } from './indicator';
 import { BlackBox } from './blackbox';
-import { Canvas } from './canvas';
 import { App } from './app';
 
 import LeaderLine from 'leader-line';
@@ -18,8 +17,7 @@ import { v4 as uuid } from 'uuid';
 
 
 function main() {
-  const c = new Canvas(app);
-  app.canvas = c;
+	app = new App();
   setupKeys();
 }
 
@@ -39,7 +37,7 @@ function setupKeys() {
         break;
       }
       case 's': {
-        app.canvas.saveNewBB();
+        app.saveNewBB();
         break;
       }
       case 'x': {
@@ -49,13 +47,13 @@ function setupKeys() {
     }
 
     let a = Number(e.key);
-    if (a != NaN && app.canvas.gens.length >= a && a > 0) {
-      app.canvas.spawn(a-1);
+    if (a != NaN && app.gens.length >= a && a > 0) {
+      app.spawn(a-1);
     }
   });
 }
 
-const app = new App();
+let app: App;
 window.addEventListener('DOMContentLoaded', event => {
   main();
 });
