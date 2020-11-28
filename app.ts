@@ -5,7 +5,7 @@ import {
   setOutputDom,
   setInputDom,
   buildBoxHTML,
-	newDivWithClass,
+  newDivWithClass,
 } from './utils';
 import { Nand } from './nand';
 import { SourceSwitch } from './source_switch';
@@ -20,28 +20,15 @@ export class App {
   selectedIndex: number;
   selectionIsInput: boolean;
 
+  savedBBs: SavedBB[];
   children: IBox[];
   gens: Generator[];
 
   constructor() {
     this.children = [];
-    this.gens = [
-      {
-        f: (app: App, id: string) => new SourceSwitch(app, true, id),
-        label: 'input',
-        id: uuid(),
-      },
-      {
-        f: (app: App, id: string) => new Indicator(app, true, id),
-        label: 'output',
-        id: uuid(),
-      },
-      {
-        f: (app: App, id: string) => new Nand(app, true, id),
-        label: 'nand',
-        id: uuid(),
-      },
-    ];
+		this.savedBBs = [];
+    this.resetGens();
+		this.loadSavedBBs();
     this.updateBar();
   }
 
@@ -71,13 +58,35 @@ export class App {
   saveNewBB() {
     const g = this.makeG();
     const label = prompt('label', '');
+    const chipID = uuid();
 
     let newBB = (app: App, id: string): IBox =>
       new BlackBox(app, true, g, label, id);
-    this.gens.push({ f: newBB, label, id: uuid() });
+    this.gens.push({ f: newBB, label, id: chipID });
     this.clear();
     this.updateBar();
+
+    this.savedBBs.push({
+      graph: g,
+      label: label,
+      id: chipID,
+    });
+		localStorage.setItem('save_key', JSON.stringify(this.savedBBs));
   }
+
+	loadSavedBBs() {
+		let raw = localStorage.getItem('save_key');
+		if (!raw){
+			return;
+		}
+		this.savedBBs = JSON.parse(raw);
+
+		this.savedBBs.forEach(bb => {
+			let newBB = (app: App, id: string): IBox =>
+				new BlackBox(app, true, bb.graph, bb.label, id);
+			this.gens.push({ f: newBB, label: bb.label, id: bb.id });
+		});
+	}
 
   updateBar() {
     const bar = document.getElementById('bar');
@@ -85,7 +94,7 @@ export class App {
 
     this.gens.forEach((g, i) => {
       const d = newDivWithClass('barItem');
-      d.innerText = `${g.label}  (${i+1})`;
+      d.innerText = `${g.label}  (${i + 1})`;
       d.id = g.id;
       d.onclick = e => {
         this.children.push(g.f(this, uuid()));
@@ -129,6 +138,26 @@ export class App {
     this.clearSelection();
     this.remove(selected);
   }
+
+  resetGens() {
+    this.gens = [
+      {
+        f: (app: App, id: string) => new SourceSwitch(app, true, id),
+        label: 'input',
+        id: uuid(),
+      },
+      {
+        f: (app: App, id: string) => new Indicator(app, true, id),
+        label: 'output',
+        id: uuid(),
+      },
+      {
+        f: (app: App, id: string) => new Nand(app, true, id),
+        label: 'nand',
+        id: uuid(),
+      },
+    ];
+  }
 }
 
 type Generator = {
@@ -137,3 +166,8 @@ type Generator = {
   id: string;
 };
 
+type SavedBB = {
+  graph: G;
+  label: string;
+  id: string;
+};
