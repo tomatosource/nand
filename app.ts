@@ -61,7 +61,7 @@ export class App {
     const chipID = uuid();
 
     let newBB = (app: App, id: string): IBox =>
-      new BlackBox(app, true, g, label, id);
+			new BlackBox(app, true, g, label, id);
     this.gens.push({ f: newBB, label, id: chipID });
     this.clear();
     this.updateBar();
@@ -109,11 +109,55 @@ export class App {
           e.stopPropagation();
         };
         barItem.appendChild(x);
+
+        const edit = newDivWithClass('barItemEdit');
+        edit.innerText = 'e';
+        edit.onclick = e => {
+					this.editBB(g.id);
+          e.stopPropagation();
+        };
+        barItem.appendChild(edit);
       }
 
       bar.appendChild(barItem);
     });
   }
+
+	editBB(id: String) {
+		this.clear();
+		const g = this.savedBBs.filter(sbb => sbb.id === id)[0].graph;
+
+    g.nodes.forEach(n => {
+      switch (n.kind) {
+        case AtomType.I: {
+          const i = new SourceSwitch(this, true, n.id);
+          this.children.push(i);
+          break;
+        }
+        case AtomType.O: {
+          const o = new Indicator(this, true, n.id);
+          this.children.push(o);
+          break;
+        }
+        case AtomType.NAND: {
+          const nand = new Nand(this, true, n.id);
+          this.children.push(nand);
+          break;
+        }
+        case AtomType.BB: {
+          const bb = new BlackBox(this, true, n.innerG, n.label, n.id);
+          this.children.push(bb);
+          break;
+        }
+      }
+    });
+
+    g.edges.forEach(e => {
+      const start = this.children.filter(c => c.id === e.n1)[0];
+      const end = this.children.filter(c => c.id === e.n2)[0];
+      start.addInputConnection(end, e.n2Index, e.n1Index);
+    });
+	}
 
   removeBarItem(id: string) {
     this.gens = this.gens.filter(g => g.id !== id);
