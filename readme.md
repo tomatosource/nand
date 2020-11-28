@@ -10,10 +10,17 @@ parcel index.html
 
 ## TODO
 
+ - ux improvements
+	 - stop canvas resizing on spawn
+	 - better node sizes / colors
+	 - style atoms
+	 - better connectin points
+	 - place new element
+	 - live arrow off of active pin
+	 - better right bar look and scroll
+ - replace line lib
  - document pins (shortname, longname, description)
  - document chip (label, description)
- - ux improvements
- - replace line lib
  - replbace draggable lib
 
 ## Controls
