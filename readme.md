@@ -10,15 +10,11 @@ parcel index.html
 
 ## TODO
 
- - save/load BBs between sessions
- - load BB as canvas
- - delete saved Gs
- - document pins (use as ordering)
-   - active pin (key: e)
- - document chip
- - fixed sources
+ - delete saved BBs // child button - DOTS
+ - load BB as canvas // child button - DOTS
  - clock
- - new canvas
+ - document pins (shortname, longname, description)
+ - document chip (label, description)
  - ux improvements
- - input/outputs => pins
- - deep edits
+ - replace line lib
+ - replbace draggable lib
