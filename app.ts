@@ -11,6 +11,7 @@ import { Nand } from './nand';
 import { SourceSwitch } from './source_switch';
 import { Indicator } from './indicator';
 import { BlackBox } from './blackbox';
+import { Clock } from './clock';
 
 import PlainDraggable from 'plain-draggable';
 import { v4 as uuid } from 'uuid';
@@ -101,7 +102,7 @@ export class App {
         e.stopPropagation();
       };
 
-      if (i > 2) {
+      if (i > 3) {
         const x = newDivWithClass('barItemExit');
         x.innerText = 'x';
         x.onclick = e => {
@@ -218,6 +219,11 @@ export class App {
       {
         f: (app: App, id: string) => new Nand(app, true, id),
         label: 'nand',
+        id: uuid(),
+      },
+      {
+        f: (app: App, id: string) => new Clock(app, true, id),
+        label: 'clock',
         id: uuid(),
       },
     ];
