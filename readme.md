@@ -10,13 +10,8 @@ parcel index.html
 
 ## TODO
 
- - save/load BBs between sessions
- - ux improvements
-   - render labels
-	 - source switch styles
-	 - indicator styles
-	 - new BB
  - refactor/organise code
+ - save/load BBs between sessions
  - load BB as canvas
  - delete saved Gs
  - document pins (use as ordering)
@@ -25,5 +20,6 @@ parcel index.html
  - fixed sources
  - clock
  - new canvas
+ - ux improvements
  - input/outputs => pins
  - deep edits

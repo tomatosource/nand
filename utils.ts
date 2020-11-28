@@ -1,5 +1,5 @@
 import { IBox } from './interface';
-import { App } from './main';
+import { App } from './app';
 
 export function setOutputDom(ele: HTMLElement, index: number, state: boolean) {
   if (ele === undefined) {
