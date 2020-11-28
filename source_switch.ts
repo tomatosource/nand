@@ -135,7 +135,7 @@ export class SourceSwitch implements IBox {
   getNode(): N {
     return {
       id: this.id,
-      kind: AtomType.I,
+      kind: AtomType.INPUT,
       label: 'I',
     };
   }
@@ -144,4 +144,3 @@ export class SourceSwitch implements IBox {
     return [];
   }
 }
-

@@ -39,11 +39,11 @@ export interface E {
 }
 
 export enum AtomType {
-  BB,
+  BLACKBOX,
   NAND,
-  I,
-  O,
-  // C,
+  INPUT,
+  OUTPUT,
+  CLOCK,
   // ON,
   // OFF,
 }

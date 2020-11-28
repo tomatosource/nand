@@ -1,4 +1,4 @@
-import { G, N, E, AtomType, InputConnection, IBox } from './interface';
+import { G, N, E, InputConnection, IBox } from './interface';
 import LeaderLine from 'leader-line';
 
 export class Connection {
@@ -48,4 +48,3 @@ export class Connection {
     }
   }
 }
-

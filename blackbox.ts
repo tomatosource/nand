@@ -48,8 +48,10 @@ export class BlackBox implements IBox {
     this.graph = graph;
     this.label = label;
 
-    const inputCount = graph.nodes.filter(n => n.kind === AtomType.I).length;
-    const outputCount = graph.nodes.filter(n => n.kind === AtomType.O).length;
+    const inputCount = graph.nodes.filter(n => n.kind === AtomType.INPUT)
+      .length;
+    const outputCount = graph.nodes.filter(n => n.kind === AtomType.OUTPUT)
+      .length;
     for (let i = 0; i < outputCount; i++) {
       this.outputs.push(false);
       this.outputConnections.push([]);
@@ -61,13 +63,13 @@ export class BlackBox implements IBox {
 
     graph.nodes.forEach(n => {
       switch (n.kind) {
-        case AtomType.I: {
+        case AtomType.INPUT: {
           const i = new SourceSwitch(app, false, n.id);
           this.childInputs.push(i);
           this.children.push(i);
           break;
         }
-        case AtomType.O: {
+        case AtomType.OUTPUT: {
           const o = new Indicator(app, false, n.id);
           this.childOutputs.push(o);
           this.children.push(o);
@@ -78,7 +80,7 @@ export class BlackBox implements IBox {
           this.children.push(nand);
           break;
         }
-        case AtomType.BB: {
+        case AtomType.BLACKBOX: {
           const bb = new BlackBox(app, false, n.innerG, n.label, n.id);
           this.children.push(bb);
           break;
@@ -247,21 +249,21 @@ export class BlackBox implements IBox {
     }
   }
 
-	getNode(): N {
-		return  {
-			id: this.id,
-			innerG: this.graph,
-			kind: AtomType.BB,
-			label: this.label,
-		}
-	}
+  getNode(): N {
+    return {
+      id: this.id,
+      innerG: this.graph,
+      kind: AtomType.BLACKBOX,
+      label: this.label,
+    };
+  }
 
-	getEdges(): E[] {
-		return this.inputConnections.map((c, i) => ({
-			n1: this.id,
-			n1Index: i,
-			n2: c.sourceBox.id,
-			n2Index: c.sourceIndex,
-		}));
-	}
+  getEdges(): E[] {
+    return this.inputConnections.map((c, i) => ({
+      n1: this.id,
+      n1Index: i,
+      n2: c.sourceBox.id,
+      n2Index: c.sourceIndex,
+    }));
+  }
 }

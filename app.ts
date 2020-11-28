@@ -129,12 +129,12 @@ export class App {
 
     g.nodes.forEach(n => {
       switch (n.kind) {
-        case AtomType.I: {
+        case AtomType.INPUT: {
           const i = new SourceSwitch(this, true, n.id);
           this.children.push(i);
           break;
         }
-        case AtomType.O: {
+        case AtomType.OUTPUT: {
           const o = new Indicator(this, true, n.id);
           this.children.push(o);
           break;
@@ -144,7 +144,7 @@ export class App {
           this.children.push(nand);
           break;
         }
-        case AtomType.BB: {
+        case AtomType.BLACKBOX: {
           const bb = new BlackBox(this, true, n.innerG, n.label, n.id);
           this.children.push(bb);
           break;
