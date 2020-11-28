@@ -61,7 +61,7 @@ export class App {
     const chipID = uuid();
 
     let newBB = (app: App, id: string): IBox =>
-			new BlackBox(app, true, g, label, id);
+      new BlackBox(app, true, g, label, id);
     this.gens.push({ f: newBB, label, id: chipID });
     this.clear();
     this.updateBar();
@@ -113,7 +113,7 @@ export class App {
         const edit = newDivWithClass('barItemEdit');
         edit.innerText = 'e';
         edit.onclick = e => {
-					this.editBB(g.id);
+          this.editBB(g.id);
           e.stopPropagation();
         };
         barItem.appendChild(edit);
@@ -123,9 +123,9 @@ export class App {
     });
   }
 
-	editBB(id: String) {
-		this.clear();
-		const g = this.savedBBs.filter(sbb => sbb.id === id)[0].graph;
+  editBB(id: String) {
+    this.clear();
+    const g = this.savedBBs.filter(sbb => sbb.id === id)[0].graph;
 
     g.nodes.forEach(n => {
       switch (n.kind) {
@@ -157,7 +157,7 @@ export class App {
       const end = this.children.filter(c => c.id === e.n2)[0];
       start.addInputConnection(end, e.n2Index, e.n1Index);
     });
-	}
+  }
 
   removeBarItem(id: string) {
     this.gens = this.gens.filter(g => g.id !== id);
