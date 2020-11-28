@@ -10,7 +10,6 @@ parcel index.html
 
 ## TODO
 
- - refactor/organise code
  - save/load BBs between sessions
  - load BB as canvas
  - delete saved Gs
