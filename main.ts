@@ -1,5 +1,10 @@
 import { G, IBox, BlackBox, AtomType } from './interface';
-import { setOutputDom, setInputDom, buildBoxHTML } from './utils';
+import {
+  newDivWithClass,
+  setOutputDom,
+  setInputDom,
+  buildBoxHTML,
+} from './utils';
 import { Nand, SourceSwitch, Indicator } from './atoms';
 import LeaderLine from 'leader-line';
 import PlainDraggable from 'plain-draggable';
@@ -94,23 +99,37 @@ export class Connection {
 }
 
 type Generator = {
-	f: (app: App, id: string) => IBox;
-	label: string;
-}
+  f: (app: App, id: string) => IBox;
+  label: string;
+  id: string;
+};
 
 class Canvas {
   app: App;
   children: IBox[];
-	gens: Generator[];
+  gens: Generator[];
 
   constructor(app: App) {
     this.app = app;
     this.children = [];
-		this.gens = [
-			{f: (app: App, id: string) => new Nand(app, true, id), label: "nand"},
-			{f: (app: App, id: string) => new SourceSwitch(app, true, id), label: "input"},
-			{f: (app: App, id: string) => new Indicator(app, true, id), label: "output"},
-		];
+    this.gens = [
+      {
+        f: (app: App, id: string) => new SourceSwitch(app, true, id),
+        label: 'input',
+        id: uuid(),
+      },
+      {
+        f: (app: App, id: string) => new Indicator(app, true, id),
+        label: 'output',
+        id: uuid(),
+      },
+      {
+        f: (app: App, id: string) => new Nand(app, true, id),
+        label: 'nand',
+        id: uuid(),
+      },
+    ];
+    this.updateBar();
   }
 
   remove(box: IBox) {
@@ -136,20 +155,35 @@ class Canvas {
     }
   }
 
-	saveNewBB() {
-		const g = this.makeG();
-		const label = prompt("label", "");
+  saveNewBB() {
+    const g = this.makeG();
+    const label = prompt('label', '');
 
-		let newBB = (app: App, id: string): IBox => new BlackBox(
-			app, true, g, label, id,
-		);
-		this.gens.push({f: newBB, label});
-		this.clear();
-	}
+    let newBB = (app: App, id: string): IBox =>
+      new BlackBox(app, true, g, label, id);
+    this.gens.push({ f: newBB, label, id: uuid() });
+    this.clear();
+    this.updateBar();
+  }
 
-	newChild(i: number) {
-		this.children.push(this.gens[i].f(app, uuid()));
-	}
+  updateBar() {
+    const bar = document.getElementById('bar');
+    bar.querySelectorAll('.barItem').forEach(c => c.remove());
+
+    this.gens.forEach((g, i) => {
+      const d = newDivWithClass('barItem');
+      d.innerText = `${g.label}  (${i+1})`;
+      d.id = g.id;
+      d.onclick = e => {
+        this.children.push(g.f(app, uuid()));
+      };
+      bar.appendChild(d);
+    });
+  }
+
+  spawn(i: number) {
+    this.children.push(this.gens[i].f(app, uuid()));
+  }
 }
 
 function main() {
@@ -173,30 +207,19 @@ function setupKeys() {
         app.clearSelection();
         break;
       }
-      case 'n': {
-        app.canvas.children.push(new Nand(app, true));
-        break;
-      }
-      case 'i': {
-        app.canvas.children.push(new SourceSwitch(app, true));
-        break;
-      }
-      case 'o': {
-        app.canvas.children.push(new Indicator(app, true));
-        break;
-      }
       case 's': {
         app.canvas.saveNewBB();
-        break;
-      }
-      case '3': {
-				app.canvas.newChild(3);
         break;
       }
       case 'x': {
         app.deleteActiveBox();
         break;
       }
+    }
+
+    let a = Number(e.key);
+    if (a != NaN && app.canvas.gens.length >= a && a > 0) {
+      app.canvas.spawn(a-1);
     }
   });
 }

@@ -29,7 +29,7 @@ export class Nand implements IBox {
 
     if (rendered) {
       const canvasDiv = document.getElementById('canvas');
-      this.ele = buildBoxHTML(app, this, 2, 1, 'NAND');
+      this.ele = buildBoxHTML(app, this, 2, 1, 'nand');
       canvasDiv.appendChild(this.ele);
       setOutputDom(this.ele, 0, this.state);
       this.draggable = new PlainDraggable(this.ele);
@@ -157,7 +157,6 @@ export class Nand implements IBox {
   }
 
   clearSelection(isInput: boolean, selectedIndex: number) {
-    console.log('clear');
     clearSelectionFromBox(this, isInput, selectedIndex);
   }
 
@@ -205,7 +204,7 @@ export class SourceSwitch implements IBox {
 
     if (rendered) {
       const canvasDiv = document.getElementById('canvas');
-      this.ele = buildBoxHTML(app, this, 0, 1, 'SS');
+      this.ele = buildBoxHTML(app, this, 0, 1, 'input');
 
       this.ele.addEventListener('click', e => {
         this.toggle(e);
@@ -344,7 +343,7 @@ export class Indicator implements IBox {
 
     if (rendered) {
       const canvasDiv = document.getElementById('canvas');
-      this.ele = buildBoxHTML(app, this, 1, 0, '');
+      this.ele = buildBoxHTML(app, this, 1, 0, 'output');
       canvasDiv.appendChild(this.ele);
 
       this.draggable = new PlainDraggable(this.ele);

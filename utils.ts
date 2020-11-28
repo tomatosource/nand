@@ -97,13 +97,16 @@ export function buildBoxHTML(
     });
   }
 
+	let labelDiv = newDivWithClass("boxlabel");
+	labelDiv.innerText = label;
   container.appendChild(inputsContainer);
+  container.appendChild(labelDiv);
   container.appendChild(outputsContainer);
 
   return container;
 }
 
-function newDivWithClass(className: string): HTMLElement {
+export function newDivWithClass(className: string): HTMLElement {
   const div = document.createElement('div');
   div.className = className;
   return div;
