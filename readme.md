@@ -10,7 +10,6 @@ parcel index.html
 
 ## TODO
 
- - delete saved BBs // child button - DOTS
  - load BB as canvas // child button - DOTS
  - clock
  - document pins (shortname, longname, description)

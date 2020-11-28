@@ -36,6 +36,18 @@ html {
   align-items: center;
   justify-content: center;
   border: 1px solid white;
+  position: relative;
+}
+
+.barItemExit {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: tomato;
+  padding: 10px;
+  cursor: pointer;
+  color: white;
+  user-select: none;
 }
 
 .box {
@@ -49,11 +61,11 @@ html {
 .boxlabel {
   writing-mode: vertical-rl;
   text-orientation: mixed;
-	text-align: center;
-	text-transform: uppercase;
-	font-family: sans-serif;
-	font-weight: bold;
-	letter-spacing: 1px;
+  text-align: center;
+  text-transform: uppercase;
+  font-family: sans-serif;
+  font-weight: bold;
+  letter-spacing: 1px;
 }
 
 .box switch {

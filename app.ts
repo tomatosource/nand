@@ -26,9 +26,9 @@ export class App {
 
   constructor() {
     this.children = [];
-		this.savedBBs = [];
+    this.savedBBs = [];
     this.resetGens();
-		this.loadSavedBBs();
+    this.loadSavedBBs();
     this.updateBar();
   }
 
@@ -71,36 +71,56 @@ export class App {
       label: label,
       id: chipID,
     });
-		localStorage.setItem('save_key', JSON.stringify(this.savedBBs));
+    localStorage.setItem('save_key', JSON.stringify(this.savedBBs));
   }
 
-	loadSavedBBs() {
-		let raw = localStorage.getItem('save_key');
-		if (!raw){
-			return;
-		}
-		this.savedBBs = JSON.parse(raw);
+  loadSavedBBs() {
+    let raw = localStorage.getItem('save_key');
+    if (!raw) {
+      return;
+    }
+    this.savedBBs = JSON.parse(raw);
 
-		this.savedBBs.forEach(bb => {
-			let newBB = (app: App, id: string): IBox =>
-				new BlackBox(app, true, bb.graph, bb.label, id);
-			this.gens.push({ f: newBB, label: bb.label, id: bb.id });
-		});
-	}
+    this.savedBBs.forEach(bb => {
+      let newBB = (app: App, id: string): IBox =>
+        new BlackBox(app, true, bb.graph, bb.label, id);
+      this.gens.push({ f: newBB, label: bb.label, id: bb.id });
+    });
+  }
 
   updateBar() {
     const bar = document.getElementById('bar');
     bar.querySelectorAll('.barItem').forEach(c => c.remove());
 
     this.gens.forEach((g, i) => {
-      const d = newDivWithClass('barItem');
-      d.innerText = `${g.label}  (${i + 1})`;
-      d.id = g.id;
-      d.onclick = e => {
+      const barItem = newDivWithClass('barItem');
+      barItem.innerText = `${g.label}  (${i + 1})`;
+      barItem.id = g.id;
+      barItem.onclick = e => {
         this.children.push(g.f(this, uuid()));
+        e.stopPropagation();
       };
-      bar.appendChild(d);
+
+      if (i > 2) {
+        const x = newDivWithClass('barItemExit');
+        x.innerText = 'x';
+        x.onclick = e => {
+          this.removeBarItem(g.id);
+          e.stopPropagation();
+        };
+        barItem.appendChild(x);
+      }
+
+      bar.appendChild(barItem);
     });
+  }
+
+  removeBarItem(id: string) {
+    this.gens = this.gens.filter(g => g.id !== id);
+    this.updateBar();
+
+    this.savedBBs = this.savedBBs.filter(sbb => sbb.id !== id);
+    localStorage.setItem('save_key', JSON.stringify(this.savedBBs));
   }
 
   spawn(i: number) {

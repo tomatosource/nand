@@ -15,9 +15,8 @@ import LeaderLine from 'leader-line';
 import PlainDraggable from 'plain-draggable';
 import { v4 as uuid } from 'uuid';
 
-
 function main() {
-	app = new App();
+  app = new App();
   setupKeys();
 }
 
@@ -48,7 +47,7 @@ function setupKeys() {
 
     let a = Number(e.key);
     if (a != NaN && app.gens.length >= a && a > 0) {
-      app.spawn(a-1);
+      app.spawn(a - 1);
     }
   });
 }
