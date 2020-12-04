@@ -7,7 +7,7 @@ import {
   setInputDom,
   buildBoxHTML,
 } from './utils';
-import PlainDraggable from 'plain-draggable';
+import {Move} from './move';
 
 export class Indicator implements IBox {
   id: string;
@@ -15,9 +15,9 @@ export class Indicator implements IBox {
   input?: Connection;
   rendered: boolean;
   ele?: HTMLElement;
-  private draggable: PlainDraggable;
   forwardingList: InputConnection[];
   callback: (state: boolean) => void;
+	move: Move;
 
   constructor(app: App, rendered: boolean, id?: string) {
     this.id = id || (Math.random() + 1).toString(36).substring(7);
@@ -30,14 +30,7 @@ export class Indicator implements IBox {
       const canvasDiv = document.getElementById('canvas');
       this.ele = buildBoxHTML(app, this, 1, 0, 'output');
       canvasDiv.appendChild(this.ele);
-
-      this.draggable = new PlainDraggable(this.ele);
-      this.draggable.snap = { step: 45 };
-      this.draggable.onMove = () => {
-        if (this.input && this.input.line) {
-          this.input.line.position();
-        }
-      };
+			this.move = new Move(this.ele);
     }
   }
 
@@ -118,9 +111,6 @@ export class Indicator implements IBox {
 
   clean() {
     this.removeAllConnections();
-    if (this.draggable !== undefined) {
-      this.draggable.remove();
-    }
     if (this.ele !== undefined) {
       this.ele.remove();
     }

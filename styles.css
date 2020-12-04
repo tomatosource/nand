@@ -67,6 +67,7 @@ html {
   background: orange;
   display: flex;
   justify-content: space-between;
+	position: absolute;
 }
 
 .boxlabel {

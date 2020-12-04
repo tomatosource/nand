@@ -7,7 +7,7 @@ import {
   setInputDom,
   buildBoxHTML,
 } from './utils';
-import PlainDraggable from 'plain-draggable';
+import { Move } from './move';
 
 export class Nand implements IBox {
   id: string;
@@ -17,7 +17,7 @@ export class Nand implements IBox {
   state: boolean;
   rendered: boolean;
   ele?: HTMLElement;
-  private draggable: PlainDraggable;
+  move: Move;
 
   constructor(app: App, rendered: boolean, id?: string) {
     this.id = id || (Math.random() + 1).toString(36).substring(7);
@@ -32,23 +32,7 @@ export class Nand implements IBox {
       this.ele = buildBoxHTML(app, this, 2, 1, 'nand');
       canvasDiv.appendChild(this.ele);
       setOutputDom(this.ele, 0, this.state);
-      this.draggable = new PlainDraggable(this.ele);
-      this.draggable.snap = { step: 45 };
-      // on drag sync up lines
-      this.draggable.onMove = () => {
-        this.inputConnections.forEach(c => {
-          if (c && c.line) {
-            c.line.position();
-          }
-        });
-        this.outputs.forEach(o => {
-          o.forEach(c => {
-            if (c && c.line) {
-              c.line.position();
-            }
-          });
-        });
-      };
+      this.move = new Move(this.ele);
     }
   }
 
@@ -162,9 +146,6 @@ export class Nand implements IBox {
 
   clean() {
     this.removeAllConnections();
-    if (this.draggable !== undefined) {
-      this.draggable.remove();
-    }
     if (this.ele !== undefined) {
       this.ele.remove();
     }

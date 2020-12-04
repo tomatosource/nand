@@ -10,7 +10,7 @@ import {
 import { Nand } from './nand';
 import { SourceSwitch } from './source_switch';
 import { Indicator } from './indicator';
-import PlainDraggable from 'plain-draggable';
+import {Move} from './move';
 
 export class BlackBox implements IBox {
   id: string;
@@ -26,7 +26,7 @@ export class BlackBox implements IBox {
   childOutputs: Indicator[];
   ele?: HTMLElement;
   graph: G;
-  private draggable: PlainDraggable;
+	move: Move;
 
   constructor(
     app: App,
@@ -98,23 +98,7 @@ export class BlackBox implements IBox {
       const canvasDiv = document.getElementById('canvas');
       this.ele = buildBoxHTML(app, this, inputCount, outputCount, label);
       canvasDiv.appendChild(this.ele);
-      this.draggable = new PlainDraggable(this.ele);
-      this.draggable.snap = { step: 45 };
-      // on drag sync up lines
-      this.draggable.onMove = () => {
-        this.inputConnections.forEach(c => {
-          if (c && c.line) {
-            c.line.position();
-          }
-        });
-        this.outputConnections.forEach(o => {
-          o.forEach(c => {
-            if (c && c.line) {
-              c.line.position();
-            }
-          });
-        });
-      };
+			this.move = new Move(this.ele);
 
       this.childOutputs.forEach((o, i) => {
         o.callback = (newState: boolean) => {
@@ -241,9 +225,6 @@ export class BlackBox implements IBox {
 
   clean() {
     this.removeAllConnections();
-    if (this.draggable !== undefined) {
-      this.draggable.remove();
-    }
     if (this.ele !== undefined) {
       this.ele.remove();
     }

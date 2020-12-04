@@ -7,7 +7,7 @@
     "cssprefix": "^2.0.16",
     "leader-line": "^1.0.5",
     "m-class-list": "^1.1.9",
-    "plain-draggable": "^2.5.12",
+    "move": "^0.4.9",
     "pointer-event": "^1.0.0",
     "uuid": "^8.3.1"
   }

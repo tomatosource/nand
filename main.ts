@@ -11,10 +11,6 @@ import { Indicator } from './indicator';
 import { BlackBox } from './blackbox';
 import { App } from './app';
 
-import LeaderLine from 'leader-line';
-import PlainDraggable from 'plain-draggable';
-import { v4 as uuid } from 'uuid';
-
 function main() {
   app = new App();
   setupKeys();

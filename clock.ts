@@ -7,7 +7,6 @@ import {
   setInputDom,
   buildBoxHTML,
 } from './utils';
-import PlainDraggable from 'plain-draggable';
 
 export class Clock implements IBox {
   id: string;
@@ -15,7 +14,6 @@ export class Clock implements IBox {
   outputs: Connection[];
   rendered: boolean;
   ele?: HTMLElement;
-  private draggable: PlainDraggable;
 
   constructor(app: App, rendered: boolean, id?: string) {
     this.id = id;
@@ -29,16 +27,6 @@ export class Clock implements IBox {
 
       this.ele.className = 'box clock';
       canvasDiv.appendChild(this.ele);
-
-      this.draggable = new PlainDraggable(this.ele);
-      this.draggable.onMove = () => {
-        this.outputs.forEach(c => {
-          if (c && c.line) {
-            c.line.position();
-          }
-        });
-      };
-      this.draggable.snap = { step: 45 };
     }
 		setInterval(()=>{this.setInput(0, !this.state)}, 1000);
   }
@@ -116,9 +104,6 @@ export class Clock implements IBox {
 
   clean() {
     this.removeAllConnections();
-    if (this.draggable !== undefined) {
-      this.draggable.remove();
-    }
     if (this.ele !== undefined) {
       this.ele.remove();
     }
