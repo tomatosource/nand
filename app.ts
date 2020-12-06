@@ -6,14 +6,13 @@ import {
   setInputDom,
   buildBoxHTML,
   newDivWithClass,
+  uuid,
 } from './utils';
 import { Nand } from './nand';
 import { SourceSwitch } from './source_switch';
 import { Indicator } from './indicator';
 import { BlackBox } from './blackbox';
 import { Clock } from './clock';
-
-import { v4 as uuid } from 'uuid';
 
 export class App {
   selectedBox: IBox;
