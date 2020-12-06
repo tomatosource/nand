@@ -25,10 +25,14 @@ export class Move {
 
       document.onmousemove = (e: MouseEvent) => {
         this.moved = true;
-        this.ele.style.left = `${e.pageX - this.offX}px`;
-        this.ele.style.top = `${e.pageY - this.offY}px`;
+        this.ele.style.left = `${snappy(e.pageX - this.offX)}px`;
+        this.ele.style.top = `${snappy(e.pageY - this.offY)}px`;
         this.onMove();
       };
     };
   }
+}
+
+function snappy(n: number): number {
+  return n - (n % 25);
 }
