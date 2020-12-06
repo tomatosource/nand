@@ -10,9 +10,6 @@ parcel index.html
 
 ## TODO
 
- - replace connector lib
- - user web components
- - connectors -> event emitters
- - improve connector lib
- - styling
- - controls
+ - improve move
+ - improve line
+ - styling/controls/ux
