@@ -7,6 +7,7 @@ import {
   setInputDom,
   buildBoxHTML,
 } from './utils';
+import {Move} from './move';
 
 export class Clock implements IBox {
   id: string;
@@ -14,6 +15,7 @@ export class Clock implements IBox {
   outputs: Connection[];
   rendered: boolean;
   ele?: HTMLElement;
+	move: Move;
 
   constructor(app: App, rendered: boolean, id?: string) {
     this.id = id;
@@ -27,6 +29,10 @@ export class Clock implements IBox {
 
       this.ele.className = 'box clock';
       canvasDiv.appendChild(this.ele);
+
+      this.move = new Move(this.ele, () => {
+        this.outputs.forEach(c => c.update());
+      });
     }
 		setInterval(()=>{this.setInput(0, !this.state)}, 1000);
   }
@@ -49,9 +55,7 @@ export class Clock implements IBox {
 
       this.outputs.forEach(c => {
         if (c.line) {
-          c.line.setOptions({
-            color: this.state ? 'red' : 'grey',
-          });
+          c.line.setColor( this.state ? 'red' : 'grey', );
         }
       });
     }

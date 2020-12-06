@@ -3,12 +3,6 @@
     "typescript": "^4.1.2"
   },
   "dependencies": {
-    "anim-event": "^1.0.16",
-    "cssprefix": "^2.0.16",
-    "leader-line": "^1.0.5",
-    "m-class-list": "^1.1.9",
-    "move": "^0.4.9",
-    "pointer-event": "^1.0.0",
     "uuid": "^8.3.1"
   }
 }

@@ -7,7 +7,7 @@ import {
   setInputDom,
   buildBoxHTML,
 } from './utils';
-import {Move} from './move';
+import { Move } from './move';
 
 export class SourceSwitch implements IBox {
   id: string;
@@ -15,7 +15,7 @@ export class SourceSwitch implements IBox {
   outputs: Connection[];
   rendered: boolean;
   ele?: HTMLElement;
-	move: Move;
+  move: Move;
 
   constructor(app: App, rendered: boolean, id?: string) {
     this.id = id || (Math.random() + 1).toString(36).substring(7);
@@ -34,7 +34,9 @@ export class SourceSwitch implements IBox {
       });
       this.ele.className = 'box switch';
       canvasDiv.appendChild(this.ele);
-			this.move = new Move(this.ele);
+      this.move = new Move(this.ele, () => {
+        this.outputs.forEach(c => c.update());
+      });
     }
   }
 
@@ -56,9 +58,7 @@ export class SourceSwitch implements IBox {
 
       this.outputs.forEach(c => {
         if (c.line) {
-          c.line.setOptions({
-            color: this.state ? 'red' : 'grey',
-          });
+          c.line.setColor(this.state ? 'red' : 'grey');
         }
       });
     }

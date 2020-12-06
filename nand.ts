@@ -32,7 +32,21 @@ export class Nand implements IBox {
       this.ele = buildBoxHTML(app, this, 2, 1, 'nand');
       canvasDiv.appendChild(this.ele);
       setOutputDom(this.ele, 0, this.state);
-      this.move = new Move(this.ele);
+
+      this.move = new Move(this.ele, () => {
+        this.inputConnections.forEach(c => {
+          if (c) {
+            c.update();
+          }
+        });
+        this.outputs.forEach(ocs => {
+          ocs.forEach(c => {
+            if (c) {
+              c.update();
+            }
+          });
+        });
+      });
     }
   }
 
@@ -55,9 +69,7 @@ export class Nand implements IBox {
 
         this.outputs[0].forEach(c => {
           if (c.line) {
-            c.line.setOptions({
-              color: this.state ? 'red' : 'grey',
-            });
+            c.line.setColor(this.state ? 'red' : 'grey');
           }
         });
 

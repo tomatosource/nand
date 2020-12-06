@@ -7,7 +7,7 @@ import {
   setInputDom,
   buildBoxHTML,
 } from './utils';
-import {Move} from './move';
+import { Move } from './move';
 
 export class Indicator implements IBox {
   id: string;
@@ -17,7 +17,7 @@ export class Indicator implements IBox {
   ele?: HTMLElement;
   forwardingList: InputConnection[];
   callback: (state: boolean) => void;
-	move: Move;
+  move: Move;
 
   constructor(app: App, rendered: boolean, id?: string) {
     this.id = id || (Math.random() + 1).toString(36).substring(7);
@@ -30,7 +30,11 @@ export class Indicator implements IBox {
       const canvasDiv = document.getElementById('canvas');
       this.ele = buildBoxHTML(app, this, 1, 0, 'output');
       canvasDiv.appendChild(this.ele);
-			this.move = new Move(this.ele);
+      this.move = new Move(this.ele, () => {
+        if (this.input) {
+          this.input.update();
+        }
+      });
     }
   }
 

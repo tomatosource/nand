@@ -10,7 +10,7 @@ import {
 import { Nand } from './nand';
 import { SourceSwitch } from './source_switch';
 import { Indicator } from './indicator';
-import {Move} from './move';
+import { Move } from './move';
 
 export class BlackBox implements IBox {
   id: string;
@@ -26,7 +26,7 @@ export class BlackBox implements IBox {
   childOutputs: Indicator[];
   ele?: HTMLElement;
   graph: G;
-	move: Move;
+  move: Move;
 
   constructor(
     app: App,
@@ -98,7 +98,20 @@ export class BlackBox implements IBox {
       const canvasDiv = document.getElementById('canvas');
       this.ele = buildBoxHTML(app, this, inputCount, outputCount, label);
       canvasDiv.appendChild(this.ele);
-			this.move = new Move(this.ele);
+      this.move = new Move(this.ele, () => {
+        this.inputConnections.forEach(c => {
+          if (c) {
+            c.update();
+          }
+        });
+        this.outputConnections.forEach(ocs => {
+          ocs.forEach(c => {
+            if (c) {
+              c.update();
+            }
+          });
+        });
+      });
 
       this.childOutputs.forEach((o, i) => {
         o.callback = (newState: boolean) => {
@@ -108,9 +121,7 @@ export class BlackBox implements IBox {
           this.outputConnections.forEach(o => {
             o.forEach(c => {
               if (c.line) {
-                c.line.setOptions({
-                  color: newState ? 'red' : 'grey',
-                });
+                c.line.setColor(this.state ? 'red' : 'grey');
               }
             });
           });

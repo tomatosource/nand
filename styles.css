@@ -18,7 +18,12 @@ html {
   flex: 1;
   height: 100%;
   display: flex;
-  padding: 20px;
+}
+
+#lines {
+  position: absolute;
+  height: 100%;
+  width: 100%;
 }
 
 #bar {
@@ -67,7 +72,7 @@ html {
   background: orange;
   display: flex;
   justify-content: space-between;
-	position: absolute;
+  position: absolute;
 }
 
 .boxlabel {

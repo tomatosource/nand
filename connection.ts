@@ -1,5 +1,5 @@
 import { G, N, E, InputConnection, IBox } from './interface';
-import LeaderLine from 'leader-line';
+import { Line } from './line';
 
 export class Connection {
   id: string;
@@ -7,7 +7,7 @@ export class Connection {
   sourceIndex: number;
   destinationBox: IBox;
   destinationIndex: number;
-  line?: LeaderLine;
+  line?: Line;
   rendered: boolean;
 
   constructor(
@@ -34,17 +34,16 @@ export class Connection {
         '.ioContainer',
       );
       const destConns = destIOContainers[0].querySelectorAll('.connector');
-      this.line = new LeaderLine(
+      this.line = new Line(
         sourceConns[sourceIndex],
         destConns[destinationIndex],
-        {
-          startSocket: 'right',
-          endSocket: 'left',
-          color: initValue ? 'red' : 'grey',
-          endPlug: 'disc',
-          startPlug: 'disc',
-        },
       );
+    }
+  }
+
+  update() {
+    if (this.line) {
+      this.line.update();
     }
   }
 }
