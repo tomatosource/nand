@@ -37,6 +37,7 @@ export class Connection {
       this.line = new Line(
         sourceConns[sourceIndex],
         destConns[destinationIndex],
+        sourceBox.getOutputState(sourceIndex),
       );
     }
   }
