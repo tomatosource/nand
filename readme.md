@@ -10,6 +10,5 @@ parcel index.html
 
 ## TODO
 
- - improve move
  - improve line
  - styling/controls/ux
