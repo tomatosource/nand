@@ -14,25 +14,31 @@ export class Line {
   update() {
     let newLine = document.createElementNS(
       'http://www.w3.org/2000/svg',
-      'line',
+      'path',
     );
+
+    newLine.setAttribute('stroke-width', '2');
+    newLine.setAttribute('stroke', this.on ? 'red' : 'grey');
 
     const start = this.startEle.getBoundingClientRect();
     const end = this.endEle.getBoundingClientRect();
+    let x1 = start.x + start.width;
+    let y1 = start.height / 2 + start.top;
+    let x2 = end.x;
+    let y2 = end.y + end.height / 2;
+    let midX = (x1 + x2) / 2;
 
-    newLine.setAttribute('id', 'line2');
-    newLine.setAttribute('x1', `${start.x + start.width}`);
-    newLine.setAttribute('y1', `${start.height / 2 + start.top}`);
-    newLine.setAttribute('x2', `${end.x}`);
-    newLine.setAttribute('y2', `${end.y + end.height / 2}`);
+    newLine.setAttributeNS(
+      null,
+      'd',
+      `M ${x1} ${y1} L${midX} ${y1} ${midX} ${y2} ${x2} ${y2}`,
+    );
 
-		const c = this.on ? 'red' : 'grey';
-    newLine.setAttribute('stroke', c);
     if (this.line !== undefined) {
       this.line.remove();
     }
-    this.line = newLine;
     document.getElementById('lines').append(newLine);
+    this.line = newLine;
   }
 
   setColor(c: string) {

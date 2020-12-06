@@ -18,13 +18,14 @@ html {
   flex: 1;
   height: 100%;
   display: flex;
-	z-index: 999;
+  z-index: 999;
 }
 
 #lines {
   position: absolute;
   height: 100%;
   width: 100%;
+  fill: none;
 }
 
 #bar {
