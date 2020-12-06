@@ -1,20 +1,33 @@
 export class Move {
   ele?: HTMLElement;
-	onMove: ()=>void;
+  onMove: () => void;
+  offX: number;
+  offY: number;
+  moved: boolean;
 
-  constructor(ele: HTMLElement, onMove: ()=>void) {
+  constructor(ele: HTMLElement, onMove: () => void) {
     this.ele = ele;
-		this.onMove = onMove;
-    this.ele.onmousedown = () => {
-      document.onmouseup = () => {
-        this.ele.onmousemove = undefined;
+    this.onMove = onMove;
+    this.moved = false;
+
+    this.ele.onmousedown = (ee: MouseEvent) => {
+      let rect = this.ele.getBoundingClientRect();
+      this.offX = ee.x - rect.x;
+      this.offY = ee.y - rect.y;
+
+      document.onmouseup = (eee: MouseEvent) => {
+        if (this.moved) {
+          eee.stopPropagation();
+        }
+        this.moved = false;
+        document.onmousemove = undefined;
       };
 
-      this.ele.onmousemove = (e: MouseEvent) => {
-        this.ele.style.left = `${e.pageX - 50}px`;
-        this.ele.style.top = `${e.pageY - 50}px`;
-				this.onMove();
-        // TODO if drag stop e prop of mouse click?
+      document.onmousemove = (e: MouseEvent) => {
+        this.moved = true;
+        this.ele.style.left = `${e.pageX - this.offX}px`;
+        this.ele.style.top = `${e.pageY - this.offY}px`;
+        this.onMove();
       };
     };
   }
