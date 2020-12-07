@@ -95,14 +95,20 @@ export function buildBoxHTML(
     });
   }
 
-  let labelDiv = newDivWithClass('boxlabel');
+  let className = 'boxlabel';
+  if (inputs == 0) {
+    className = 'boxlabel output';
+  } else if (outputs == 0) {
+    className = 'boxlabel input';
+  }
+  let labelDiv = newDivWithClass(className);
   labelDiv.innerText = label;
   container.appendChild(inputsContainer);
   container.appendChild(labelDiv);
   container.appendChild(outputsContainer);
 
-  container.style.left = `${window.innerWidth / 2}px`;
-  container.style.top = `${window.innerHeight / 2}px`;
+  container.style.left = `${snappy(window.innerWidth / 2)}px`;
+  container.style.top = `${snappy(window.innerHeight / 2)}px`;
 
   return container;
 }
@@ -137,4 +143,8 @@ export function uuid(): string {
       v = c == 'x' ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
+}
+
+export function snappy(n: number): number {
+  return n - (n % 16);
 }

@@ -1,3 +1,5 @@
+import { snappy } from './utils';
+
 export class Move {
   ele?: HTMLElement;
   onMove: () => void;
@@ -31,8 +33,4 @@ export class Move {
       };
     };
   }
-}
-
-function snappy(n: number): number {
-  return n - (n % 16);
 }

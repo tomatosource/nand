@@ -17,15 +17,15 @@ export class Line {
       'path',
     );
 
-    newLine.setAttribute('stroke-width', '2');
-    newLine.setAttribute('stroke', this.on ? 'orange' : 'grey');
+    newLine.setAttribute('stroke-width', '1');
+    newLine.setAttribute('stroke', this.on ? '#10a9a9' : 'grey');
 
     const start = this.startEle.getBoundingClientRect();
     const end = this.endEle.getBoundingClientRect();
-    let x1 = start.x + start.width - 8;
-    let y1 = start.height / 2 + start.top - 8;
-    let x2 = end.x -8;
-    let y2 = end.y + end.height / 2 - 8;
+    let x1 = start.x + start.width;
+    let y1 = start.y + start.height / 2;
+    let x2 = end.x;
+    let y2 = end.y + start.height / 2;
     let midX = (x1 + x2) / 2;
 
     newLine.setAttributeNS(

@@ -50,7 +50,7 @@ export class Connection {
 
   on() {
     if (this.line) {
-      this.line.setColor('orange');
+      this.line.setColor('#10a9a9');
     }
   }
 
