@@ -69,7 +69,7 @@ export class Nand implements IBox {
 
         this.outputs[0].forEach(c => {
           if (c.line) {
-            c.line.setColor(this.state ? 'red' : 'grey');
+						this.state ? c.on(): c.off();
           }
         });
 

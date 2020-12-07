@@ -58,7 +58,7 @@ export class SourceSwitch implements IBox {
 
       this.outputs.forEach(c => {
         if (c.line) {
-          c.line.setColor(this.state ? 'red' : 'grey');
+					this.state ? c.on(): c.off();
         }
       });
     }

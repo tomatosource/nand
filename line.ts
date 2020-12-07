@@ -18,14 +18,14 @@ export class Line {
     );
 
     newLine.setAttribute('stroke-width', '2');
-    newLine.setAttribute('stroke', this.on ? 'red' : 'grey');
+    newLine.setAttribute('stroke', this.on ? 'orange' : 'grey');
 
     const start = this.startEle.getBoundingClientRect();
     const end = this.endEle.getBoundingClientRect();
-    let x1 = start.x + start.width;
-    let y1 = start.height / 2 + start.top;
-    let x2 = end.x;
-    let y2 = end.y + end.height / 2;
+    let x1 = start.x + start.width - 8;
+    let y1 = start.height / 2 + start.top - 8;
+    let x2 = end.x -8;
+    let y2 = end.y + end.height / 2 - 8;
     let midX = (x1 + x2) / 2;
 
     newLine.setAttributeNS(

@@ -47,4 +47,16 @@ export class Connection {
       this.line.update();
     }
   }
+
+  on() {
+    if (this.line) {
+      this.line.setColor('orange');
+    }
+  }
+
+  off() {
+    if (this.line) {
+      this.line.setColor('grey');
+    }
+  }
 }

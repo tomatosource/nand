@@ -90,10 +90,10 @@ export class App {
   updateBar() {
     const bar = document.getElementById('bar');
     bar.querySelectorAll('.barItem').forEach(c => c.remove());
-
+    const pad = (a, b) => (1e15 + a + '').slice(-b);
     this.gens.forEach((g, i) => {
       const barItem = newDivWithClass('barItem');
-      barItem.innerText = `${g.label}  (${i + 1})`;
+      barItem.innerText = `[${pad(i + 1, 2)}] ${g.label}`;
       barItem.id = g.id;
       barItem.onclick = e => {
         this.children.push(g.f(this, uuid()));

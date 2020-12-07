@@ -27,8 +27,9 @@ export function buildBoxHTML(
   label: string,
 ): HTMLElement {
   const container = newDivWithClass('box');
-
   const inputsContainer = newDivWithClass('ioContainer');
+  inputsContainer.className = 'ioContainer inputs';
+
   for (let i = 0; i < inputs; i++) {
     const input = newDivWithClass('connector');
     inputsContainer.appendChild(input);
@@ -57,14 +58,11 @@ export function buildBoxHTML(
         }
       }
     });
-
-    if (i < inputs - 1) {
-      const spacer = newDivWithClass('connectorSpacer');
-      inputsContainer.appendChild(spacer);
-    }
   }
 
   const outputsContainer = newDivWithClass('ioContainer');
+  outputsContainer.className = 'ioContainer outputs';
+
   for (let i = 0; i < outputs; i++) {
     const output = newDivWithClass('connector off');
     outputsContainer.appendChild(output);
@@ -97,11 +95,14 @@ export function buildBoxHTML(
     });
   }
 
-	let labelDiv = newDivWithClass("boxlabel");
-	labelDiv.innerText = label;
+  let labelDiv = newDivWithClass('boxlabel');
+  labelDiv.innerText = label;
   container.appendChild(inputsContainer);
   container.appendChild(labelDiv);
   container.appendChild(outputsContainer);
+
+  container.style.left = `${window.innerWidth / 2}px`;
+  container.style.top = `${window.innerHeight / 2}px`;
 
   return container;
 }
@@ -131,8 +132,9 @@ export function clearSelectionFromBox(
 }
 
 export function uuid(): string {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    var r = (Math.random() * 16) | 0,
+      v = c == 'x' ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
 }

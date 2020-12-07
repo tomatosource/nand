@@ -121,7 +121,7 @@ export class BlackBox implements IBox {
           this.outputConnections.forEach(o => {
             o.forEach(c => {
               if (c.line) {
-                c.line.setColor(this.state ? 'red' : 'grey');
+                this.state ? c.on() : c.off();
               }
             });
           });

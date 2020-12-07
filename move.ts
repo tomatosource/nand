@@ -34,5 +34,5 @@ export class Move {
 }
 
 function snappy(n: number): number {
-  return n - (n % 25);
+  return n - (n % 16);
 }

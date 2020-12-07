@@ -1,11 +1,14 @@
-*,
+,
 html {
   margin: 0;
   padding: 0;
 }
 
 html {
-  background: lemonchiffon;
+  background: #20394e;
+  background-image: radial-gradient(#9bacda 1%, transparent 3%);
+  background-position: 0 0, 32px 32px;
+  background-size: 32px 32px;
 }
 
 #app {
@@ -30,51 +33,62 @@ html {
 
 #bar {
   height: 100%;
-  width: 150px;
+  width: 175px;
 }
 
 .barItem {
-  width: 100%;
-  height: 100px;
-  font-size: 26px;
-  color: white;
-  background: tan;
-  display: flex;
   align-items: center;
-  justify-content: center;
-  border: 1px solid white;
+  background: #20394e;
+  border: 1px solid #10a9a9;
+  border-right: none;
+  color: #10a9a9;
+  display: flex;
+  font-family: monospace;
+  font-size: 16px;
+  font-weight: bold;
+  height: 32px;
+  margin: 8px 0px;
+  padding-left: 16px;
   position: relative;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .barItemExit {
   position: absolute;
   top: 0;
   right: 0;
-  background: tomato;
+  border: 1px solid #10a9a9;
   padding: 10px;
   cursor: pointer;
-  color: white;
+  color: 1px solid #10a9a9;
+  padding: 2px;
+  font-family: monospace;
   user-select: none;
+  font-size: 8px;
+  margin: 4px 2px;
 }
 
 .barItemEdit {
   position: absolute;
   bottom: 0;
   right: 0;
-  background: palegreen;
-  padding: 10px;
+  font-family: monospace;
+  border: 1px solid #10a9a9;
+  color: 1px solid #10a9a9;
+  padding: 2px;
   cursor: pointer;
-  color: black;
   user-select: none;
+  font-size: 8px;
+  margin: 4px 2px;
 }
 
 .box {
-  height: 100px;
-  width: 100px;
-  background: orange;
+  background: #1b1c23;
   display: flex;
   justify-content: space-between;
   position: absolute;
+  color: lightgrey;
 }
 
 .boxlabel {
@@ -86,6 +100,7 @@ html {
   font-weight: bold;
   letter-spacing: 1px;
   user-select: none;
+  padding: 4px;
 }
 
 .box switch {
@@ -93,32 +108,40 @@ html {
 }
 
 .ioContainer {
-  height: 100%;
-  width: 25%;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
+	padding-top: 8px;
+}
+
+
+.ioContainer.inputs {
+  transform: translate(-10px, 0px);
+}
+
+.ioContainer.outputs {
+  transform: translate(10px, 0px);
 }
 
 .connector {
-  width: 100%;
   background: grey;
-  flex: 1;
+  border-radius: 50%;
+  height: 24px;
+  width: 24px;
+	margin-bottom: 8px;
 }
 
 .connector.on {
-  background: red;
+  background: orange;
 }
 
 .connector.on.active {
-  background: green;
+  background: #10a9a9;
 }
 
 .connector.active {
-  background: green;
+  background: #10a9a9;
 }
 
 .connectorSpacer {
-  flex: 0.5;
-  background: none;
+  height: 22px;
+  width: 22px;
+  margin: 6px 0px;
 }
