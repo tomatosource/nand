@@ -27,16 +27,44 @@ export class Line {
     let x2 = end.x;
     let y2 = end.y + start.height / 2;
     let midX = (x1 + x2) / 2;
+    let midY = lerp(y1, y2, 0.5);
+    let xBuffer = 24;
+    let yBuffer = 48;
 
-    newLine.setAttributeNS(
-      null,
-      'd',
-      `M ${x1} ${y1} L${midX} ${y1} ${midX} ${y2} ${x2} ${y2}`,
-    );
+    if (x1 > x2) {
+      if (y1 > y2) {
+        newLine.setAttributeNS(
+          null,
+          'd',
+          `M ${x1} ${y1} L ${x1 + xBuffer} ${y1} ${x1 + xBuffer} ${
+            midY + yBuffer
+          } ${x2 - xBuffer} ${midY - yBuffer} ${
+            x2 - xBuffer
+          } ${y2} ${x2} ${y2}`,
+        );
+      } else {
+        newLine.setAttributeNS(
+          null,
+          'd',
+          `M ${x1} ${y1} L ${x1 + xBuffer} ${y1} ${x1 + xBuffer} ${
+            midY - yBuffer
+          } ${x2 - xBuffer} ${midY + yBuffer} ${
+            x2 - xBuffer
+          } ${y2} ${x2} ${y2}`,
+        );
+      }
+    } else {
+      newLine.setAttributeNS(
+        null,
+        'd',
+        `M ${x1} ${y1} L${midX} ${y1} ${midX} ${y2} ${x2} ${y2}`,
+      );
+    }
 
     if (this.line !== undefined) {
       this.line.remove();
     }
+
     document.getElementById('lines').append(newLine);
     this.line = newLine;
   }
@@ -52,4 +80,8 @@ export class Line {
       this.line.remove();
     }
   }
+}
+
+function lerp(v0: number, v1: number, t: number): number {
+  return v0 * (1 - t) + v1 * t;
 }

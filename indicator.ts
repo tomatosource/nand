@@ -6,6 +6,7 @@ import {
   setOutputDom,
   setInputDom,
   buildBoxHTML,
+  uuid,
 } from './utils';
 import { Move } from './move';
 
@@ -17,6 +18,7 @@ export class Indicator implements IBox {
   ele?: HTMLElement;
   forwardingList: InputConnection[];
   callback: (state: boolean) => void;
+  flag: string;
   move: Move;
 
   constructor(app: App, rendered: boolean, id?: string) {
@@ -47,14 +49,20 @@ export class Indicator implements IBox {
   }
 
   setInput(i: number, v: boolean): void {
-    if (v != this.state) {
-      this.state = v;
-      setInputDom(this.ele, i, v);
-      this.forwardingList.forEach(ic => {
-        ic.box.setInput(ic.index, v);
-      });
-      this.callback(v);
-    }
+    let x = uuid();
+    this.flag = x;
+    setTimeout(() => {
+      if (this.flag == x) {
+        if (v != this.state) {
+          this.state = v;
+          setInputDom(this.ele, i, v);
+          this.forwardingList.forEach(ic => {
+            ic.box.setInput(ic.index, v);
+          });
+          this.callback(v);
+        }
+      }
+    }, Math.random() * 10);
   }
 
   addInputConnection(

@@ -94,10 +94,36 @@ export class BlackBox implements IBox {
       start.addInputConnection(end, e.n2Index, e.n1Index);
     });
 
+    this.childOutputs.forEach((o, i) => {
+      this.outputs[i] = o.getInputState(0);
+      o.callback = (newState: boolean) => {
+        this.outputs[i] = newState;
+      };
+    });
+
     if (rendered) {
       const canvasDiv = document.getElementById('canvas');
       this.ele = buildBoxHTML(app, this, inputCount, outputCount, label);
       canvasDiv.appendChild(this.ele);
+
+      this.childOutputs.forEach((o, i) => {
+        this.outputs[i] = o.getInputState(0);
+        setOutputDom(this.ele, i, this.outputs[i]);
+
+        o.callback = (newState: boolean) => {
+          this.outputs[i] = newState;
+          setOutputDom(this.ele, i, newState);
+
+          this.outputConnections.forEach(o => {
+            o.forEach(c => {
+              if (c.line) {
+                this.state ? c.on() : c.off();
+              }
+            });
+          });
+        };
+      });
+
       this.move = new Move(this.ele, () => {
         this.inputConnections.forEach(c => {
           if (c) {
@@ -111,21 +137,6 @@ export class BlackBox implements IBox {
             }
           });
         });
-      });
-
-      this.childOutputs.forEach((o, i) => {
-        o.callback = (newState: boolean) => {
-          this.outputs[i] = newState;
-          setOutputDom(this.ele, i, newState);
-
-          this.outputConnections.forEach(o => {
-            o.forEach(c => {
-              if (c.line) {
-                this.state ? c.on() : c.off();
-              }
-            });
-          });
-        };
       });
     }
   }

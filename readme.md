@@ -10,11 +10,10 @@ parcel index.html
 
 ## TODO
 
-- support backwards lines
-- save layout in chip
-- make sure SR latch works
 - toolbar
-- name indicators
-- name source switches
-- custom indicators styles
-- custom source switch style
+- replace source switch and indicators for pins
+- custom pin styles
+- replace timeout with something smarter
+	- on input -> check if any other inputs touch changed source path
+	  - if so mark dirty
+		- changed || dirty == calc new state

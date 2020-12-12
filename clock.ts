@@ -36,7 +36,7 @@ export class Clock implements IBox {
     }
     setInterval(() => {
       this.setInput(0, !this.state);
-    }, 1000);
+    }, 2000);
   }
 
   getOutputState(_: number): boolean {
